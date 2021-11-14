@@ -15,7 +15,6 @@ class Pdf extends \MapasCulturais\Controller{
         $options = new Options();
         $options->setIsRemoteEnabled(true);
         $options->setIsHtml5ParserEnabled(true);
-        $domPdf = new Dompdf();
        
         ini_set('display_errors', 1);
         error_reporting(E_ALL);
@@ -233,16 +232,30 @@ class Pdf extends \MapasCulturais\Controller{
         return $opp;
     }
 
-    function GET_gerarFpdf() {
-        ini_set('display_errors', 1);
-        error_reporting(E_ALL);
-        //require(PROTECTED_PATH.'vendor/setasign/fpdf/fpdf.php');
-        $mpdf = new MPDF(['orientation' => 'L']);
-        header("Content-type:application/pdf");
-        echo '<h1>Hello world!</h1>';
-        // $mpdf->WriteHTML('<h1>Hello world!</h1>');
-        // $mpdf->Output();
-        // header('Content-Type: application/pdf');
+    function GET_minha_inscricao() {
+        $app = App::i();
+        $domPdf = new Dompdf();
+
+        $reg = $app->repo('Registration')->find($this->data['id']);
+        //INSTANCIA DO TIPO ARRAY OBJETO
+        $app->view->regObject = new \ArrayObject;
+        $app->view->regObject['ins'] = $reg;
+        // dump($reg->sentTimestamp->format('d/m/Y'));
+        // die;
+        //$entity->getFile('header')
+        $template   = 'pdf/my-registration';
+        // $app->render($template);
+        $content = $app->view->fetch($template);
+        $domPdf->setBasePath(PLUGINS_PATH.'PDFReport/assets/css');
+        $domPdf->loadHtml($content);
+        $domPdf->setPaper('A4', 'portrait');
+        
+        $domPdf->render();
+        // Output the generated PDF to Browser
+        //$domPdf->stream();
+        $domPdf->stream("relatorio.pdf", array("Attachment" => false));
+        exit(0);
+
     }
 
 }
