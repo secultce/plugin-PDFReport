@@ -2,10 +2,12 @@
 namespace PDFReport\Controllers;
 
 require PLUGINS_PATH.'PDFReport/vendor/autoload.php';
+require PLUGINS_PATH.'PDFReport/vendor/dompdf/dompdf/src/FontMetrics.php';
 use DateTime;
 use \MapasCulturais\App;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use FontMetrics as Font_Metrics;
 
 class Pdf extends \MapasCulturais\Controller{
 
@@ -233,6 +235,7 @@ class Pdf extends \MapasCulturais\Controller{
     }
 
     function GET_minha_inscricao() {
+        ini_set('display_errors', 1);
         $app = App::i();
         $domPdf = new Dompdf();
 
@@ -240,17 +243,27 @@ class Pdf extends \MapasCulturais\Controller{
         //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
-        // dump($reg->sentTimestamp->format('d/m/Y'));
+        // $this->_agentsData = $this->_getAgentsData();
+        // dump($reg->owner->metadata);
         // die;
         //$entity->getFile('header')
         $template   = 'pdf/my-registration';
-        // $app->render($template);
+        //$app->render($template);
         $content = $app->view->fetch($template);
         $domPdf->setBasePath(PLUGINS_PATH.'PDFReport/assets/css');
         $domPdf->loadHtml($content);
         $domPdf->setPaper('A4', 'portrait');
         
         $domPdf->render();
+        // $canvas = $domPdf->getCanvas();
+        // $footer = $canvas->open_object();
+        // $w = $canvas->get_width();
+        // $h = $canvas->get_height();
+        // $canvas->page_text($w-60,$h-28,"Página {PAGE_NUM} de {PAGE_COUNT}", Font_Metrics::get_font('helvetica'),6);
+        // $canvas->page_text($w-590,$h-28,"El pie de p&aacute;gina del lado izquiero, Guadalajara, Jalisco C.P. XXXXX Tel. XX (XX) XXXX XXXX", Font_Metrics::get_font('helvetica'),6);
+
+        // $canvas->close_object();
+        // $canvas->add_object($footer,"all");
         // Output the generated PDF to Browser
         //$domPdf->stream();
         $domPdf->stream("relatorio.pdf", array("Attachment" => false));
