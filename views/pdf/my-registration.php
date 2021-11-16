@@ -2,7 +2,6 @@
 $this->layout = 'nolayout';
 $reg = $app->view->regObject['ins'];
 
-// dump($reg->opportunity); die;
 include_once('header.php');  
 
 if (!empty($reg->opportunity->getFile('header')->path)) :
@@ -22,7 +21,7 @@ if (!empty($reg->opportunity->getFile('header')->path)) :
                         <div
                             <?php if ($header = $reg->opportunity->getFile('header')) : ?>
                                 class="header-image"
-                                style="background-image: url(<?php echo $header->transform('header')->url; ?>);"
+                                style="background-image: url(<?php //echo $header->transform('header')->url; ?>);"
                             <?php endif; ?>
                         >
                         </div> -->
@@ -40,7 +39,7 @@ if (!empty($reg->opportunity->getFile('header')->path)) :
         <thead>
 </table>
 <?php endif; ?>
-
+<main>
 <table style="width: 100%;" class="table-info-ins">
     <thead>
         <tr>
@@ -103,7 +102,7 @@ if (!empty($reg->opportunity->getFile('header')->path)) :
         <tr>
             <td>
                 <div  style="border: 1px solid #E8E8E8; border-radius: 8px; width:  100%;; height: 400px;">
-                    <label class="mt-4">
+                    <label class="my-registration-fields">
                         Agente responsável pela inscrição
                     </label>
                     <br>
@@ -122,19 +121,19 @@ if (!empty($reg->opportunity->getFile('header')->path)) :
                         style="width: 24px;height: 24px;flex: none;order: 0;flex-grow: 0;margin: 0px 8px;"> -->
                     <?php endif; ?>
                     <br> <br>
-                    <label class="mt-4">Site: </label><span><?php echo ""; ?></label><br>
-                    <label class="mt-4">Nome completo: </label><span> <?php echo $reg->owner->name; ?></span><br>
-                    <label class="mt-4">Data de Nascimento/Fundação: </label><span><?php echo $reg->owner->metadata['dataDeNascimento']; ?></span><br>
-                    <label class="mt-4">Gênero: </label><span><?php echo $reg->owner->metadata['genero']; ?></span><br>
-                    <label class="mt-4">Orientação Sexual: </label><span><?php echo $reg->owner->metadata['orientacaoSexual']; ?></span><br>
-                    <label class="mt-4">Raça/Cor: </label><span><?php echo $reg->owner->metadata['raca']; ?></span><br>
-                    <label class="mt-4">Email Privado: </label><span><?php echo $reg->owner->metadata['emailPrivado']; ?></span><br>
-                    <label class="mt-4">E-mail: </label><span><?php echo $reg->owner->metadata['emailPublico']; ?></span><br>
-                    <label class="mt-4">Telefone Público: </label><span><?php echo $reg->owner->metadata['telefonePublico']; ?></span><br>
-                    <label class="mt-4">Telefone 1: </label><span><?php echo $reg->owner->metadata['telefone1']; ?></span><br>
-                    <label class="mt-4">Telefone 2: </label><span><?php echo $reg->owner->metadata['telefone2']; ?></span><br>
-                    <label class="mt-4">Currículo Lattes: </label><span><?php echo $reg->owner->metadata['curriculoLattes']; ?></span><br>
-                    <label class="mt-4">Grau acadêmico: </label><span><?php echo $reg->owner->metadata['profissionais_graus_academicos']; ?></span><br>
+                    <label class="my-registration-fields">Site: </label><span><?php echo ""; ?></label><br>
+                    <label class="my-registration-fields">Nome completo: </label><span> <?php echo $reg->owner->name; ?></span><br>
+                    <label class="my-registration-fields">Data de Nascimento/Fundação: </label><span><?php echo date("d/m/Y", strtotime($reg->owner->metadata['dataDeNascimento'])); ?></span><br>
+                    <label class="my-registration-fields">Gênero: </label><span><?php echo $reg->owner->metadata['genero']; ?></span><br>
+                    <label class="my-registration-fields">Orientação Sexual: </label><span><?php echo $reg->owner->metadata['orientacaoSexual']; ?></span><br>
+                    <label class="my-registration-fields">Raça/Cor: </label><span><?php echo $reg->owner->metadata['raca']; ?></span><br>
+                    <label class="my-registration-fields">Email Privado: </label><span><?php echo $reg->owner->metadata['emailPrivado']; ?></span><br>
+                    <label class="my-registration-fields">E-mail: </label><span><?php echo $reg->owner->metadata['emailPublico']; ?></span><br>
+                    <label class="my-registration-fields">Telefone Público: </label><span><?php echo $reg->owner->metadata['telefonePublico']; ?></span><br>
+                    <label class="my-registration-fields">Telefone 1: </label><span><?php echo $reg->owner->metadata['telefone1']; ?></span><br>
+                    <label class="my-registration-fields">Telefone 2: </label><span><?php echo $reg->owner->metadata['telefone2']; ?></span><br>
+                    <label class="my-registration-fields">Currículo Lattes: </label><span><?php echo $reg->owner->metadata['curriculoLattes']; ?></span><br>
+                    <label class="my-registration-fields">Grau acadêmico: </label><span><?php echo $reg->owner->metadata['profissionais_graus_academicos']; ?></span><br>
                 </div>
             </td>
         </tr>
@@ -142,13 +141,7 @@ if (!empty($reg->opportunity->getFile('header')->path)) :
 </table>
 <?php
 $fieldOp = $app->view->regObject['fieldsOpportunity'];
-foreach ($fieldOp as $key => $field) :
-    //echo "Campo: ".$field['id']." description: ".$field['description']." fieldType: ".$field['fieldType']."<br>";
-    //dump($field);
-    if($field['fieldType'] == "section") :
-        $this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
-    endif;
-endforeach;
+$this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
 
 
 include_once('footerPdf.php');
