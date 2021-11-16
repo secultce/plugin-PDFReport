@@ -3,36 +3,43 @@ $this->layout = 'nolayout';
 $reg = $app->view->regObject['ins'];
 
 // dump($reg->opportunity); die;
-include_once('header.php');  ?>
+include_once('header.php');  
 
-<table width="100%" style="height: 100px;">
+if (!empty($reg->opportunity->getFile('header')->path)) :
+
+?>
+
+<table width="100%" style="height: 100px; margin-bottom: 50px; width: 100%;">
     <thead>
         <tr>
             <td>
-                <?php if (empty($reg->opportunity->getFile('header')->path)) : ?>
-                    <!-- <img src="<?php echo $reg->opportunity->getFile('header')->path; ?>" alt=""> -->
+                <?php if (!empty($reg->opportunity->getFile('header')->path)) : ?>
+                    <!-- <img src="<?php //echo $reg->opportunity->getFile('header')->path; ?>" alt=""> -->
                     <div>
                         <br><br><br>
                     </div>
-                    <header class="main-content-header" style="border-radius: 8px;">
+                    <!-- <header class="main-content-header" style="border-radius: 8px;">
                         <div
                             <?php if ($header = $reg->opportunity->getFile('header')) : ?>
                                 class="header-image"
                                 style="background-image: url(<?php echo $header->transform('header')->url; ?>);"
                             <?php endif; ?>
                         >
-                        </div>
-                    <!-- <div>
+                        </div> -->
+                    <div>
                         <img src="<?php echo $reg->opportunity->getFile('header')->path; ?>" alt="">
-                    </div> -->
+                    </div>
                     </header>
                 <?php else : ?>
-                    <img src="<?php $this->asset('img/backgroud_header_report_opp.png') ?>" alt="">
+                    <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/backgroud_header_report_opp.png'; ?>" 
+                    style="float:left;  width: 650px"/>
+                    <!-- <img src="<?php //$this->asset('img/backgroud_header_report_opp.png') ?>" alt=""> -->
                 <?php endif; ?>
             </td>
         </tr>
         <thead>
 </table>
+<?php endif; ?>
 
 <table style="width: 100%;" class="table-info-ins">
     <thead>
@@ -59,7 +66,8 @@ include_once('header.php');  ?>
                 <?php if (!empty($reg->opportunity->files['avatar'])) : ?>
                     <img src="<?php echo $reg->opportunity->files['avatar']->path; ?>" style="width: 80px; height: 80px;">
                 <?php else : ?>
-                    <img src="<?php echo THEMES_PATH . 'BaseV1/assets/img/avatar--opportunity.png'; ?>" style="width: 80px; height: 80px;">
+                    <img src="<?php echo THEMES_PATH . 'BaseV1/assets/img/avatar--opportunity.png'; ?>" 
+                    style="width: 80px; height: 80px;">
                     <!-- <label for=""><?php echo THEMES_PATH . 'BaseV1/assets/img/avatar--opportunity.png'; ?></label> -->
                 <?php endif; ?>
 
@@ -90,21 +98,20 @@ include_once('header.php');  ?>
     </thead>
 </table>
 
-<table  style="width: 100%;">
+<table style="width: 100%;">
     <tbody>
         <tr>
             <td>
                 <div  style="border: 1px solid #E8E8E8; border-radius: 8px; width:  100%;; height: 400px;">
-                    <label style="float: left; color: rgba(0, 0, 0, 0.87);font-weight: bold; width: 100%; font-size: 10px">
+                    <label class="mt-4">
                         Agente responsável pela inscrição
-                       
                     </label>
                     <br>
                     <?php if(!empty($reg->owner->avatar)): ?>
                         <img src="<?php echo $reg->owner->avatar->transform('avatarSmall')->url ?>" alt="">
                     <?php else: ?>
                         <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/avatar--agent.png'; ?>" alt=""
-                        style="width: 24px;height: 24px;flex: none;order: 0;flex-grow: 0;margin: 0px 8px;
+                        style="width: 24px;height: 24px;flex: none;order: 0;flex-grow: 0;margin: 8px 8px;
                         background: rgba(0, 0, 0, 0.38);  border-radius: 80%">
                         <label style="font-size: 12px;line-height: 9px;color: rgba(0, 0, 0, 0.87);
                         font-style: normal;font-weight: normal;letter-spacing: 0.5px;
@@ -115,7 +122,7 @@ include_once('header.php');  ?>
                         style="width: 24px;height: 24px;flex: none;order: 0;flex-grow: 0;margin: 0px 8px;"> -->
                     <?php endif; ?>
                     <br> <br>
-                    <label class="mt-4">Site: </label><span><?php echo ""; ?></span><br>
+                    <label class="mt-4">Site: </label><span><?php echo ""; ?></label><br>
                     <label class="mt-4">Nome completo: </label><span> <?php echo $reg->owner->name; ?></span><br>
                     <label class="mt-4">Data de Nascimento/Fundação: </label><span><?php echo $reg->owner->metadata['dataDeNascimento']; ?></span><br>
                     <label class="mt-4">Gênero: </label><span><?php echo $reg->owner->metadata['genero']; ?></span><br>
@@ -134,4 +141,14 @@ include_once('header.php');  ?>
     </tbody>
 </table>
 <?php
+$fieldOp = $app->view->regObject['fieldsOpportunity'];
+foreach ($fieldOp as $key => $field) :
+    //echo "Campo: ".$field['id']." description: ".$field['description']." fieldType: ".$field['fieldType']."<br>";
+    //dump($field);
+    if($field['fieldType'] == "section") :
+        $this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
+    endif;
+endforeach;
+
+
 include_once('footerPdf.php');
