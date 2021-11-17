@@ -1,6 +1,10 @@
 body {  
    font-family: 'Helvetica'  !important;
 }
+@page {  margin: 24px 24px;  }
+footer { position: fixed; bottom: -15px; left: 0px; right: 0px;height: 50px; border-top: 1px solid #c3c3c3;
+ color: rgba(0, 0, 0, 0.6);}
+ 
 .title-edital {
     margin-left: 20px;
     color: rgba(0, 0, 0, 0.6);

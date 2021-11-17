@@ -8,6 +8,7 @@ use \MapasCulturais\App;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use PDFReport\Entities\Pdf as EntitiesPdf;
+use Mpdf\Mpdf;
 
 class Pdf extends \MapasCulturais\Controller{
 
@@ -237,7 +238,10 @@ class Pdf extends \MapasCulturais\Controller{
     function GET_minha_inscricao() {
         ini_set('display_errors', 1);
         $app = App::i();
-        $domPdf = new Dompdf();
+
+        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
+        'format' => 'A4',
+        'orientation' => 'L']);
 
         $reg = $app->repo('Registration')->find($this->data['id']);
         //INSTANCIA DO TIPO ARRAY OBJETO
@@ -258,29 +262,18 @@ class Pdf extends \MapasCulturais\Controller{
         sort($fields);
         $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
-        
+
         $template   = 'pdf/my-registration';
         //$app->render($template);
         $content = $app->view->fetch($template);
-        $domPdf->setBasePath(PLUGINS_PATH.'PDFReport/assets/css');
-        $domPdf->loadHtml($content);
-        $domPdf->setPaper('A4', 'portrait');
-        
-        $domPdf->render();
 
-        $font = $domPdf->getFontMetrics()->getFont("Arial, Helvetica, sans-serif", "normal");
-        $size = 8;
-        $pageText = "Pagina {PAGE_NUM} de {PAGE_COUNT}";
-        $domPdf->getCanvas()->page_text(180, 800, "Escola de Saúde Pública do Ceará Paulo Marcelo Martins Rodrigues.", $font, $size, array(0,0,0)); 
-        $domPdf->getCanvas()->page_text(210, 810, "Av. Antônio justa, 3161 - Meireles. CEP: 60.165-090", $font, $size, array(0,0,0)); 
-        $domPdf->getCanvas()->page_text(230, 820, "Fortaleza / CE. Fone: (85) 3101.1398", $font, $size, array(0,0,0)); 
-        // $y = $domPdf->get_height() - 20;
-        // $x = $domPdf->get_width() - 15 - $domPdf->getFontMetrics()->getTextWidth($pageText, $font, $size);
-        // $domPdf->text($x, $y, $pageText, $font, $size);
-
-        $domPdf->stream("relatorio.pdf", array("Attachment" => false));
-        exit(0);
-
+        $mpdf->SetDisplayMode('fullpage');
+        $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
+        $mpdf->WriteHTML($stylesheet,1);
+        $mpdf->WriteHTML($content,2);
+        $mpdf->Output();
+        //header("Content-type: application/pdf");
+        exit;
     }
 
     

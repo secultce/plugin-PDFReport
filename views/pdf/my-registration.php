@@ -43,7 +43,7 @@ if (!empty($reg->opportunity->getFile('header')->path)) :
 <table style="width: 100%;" class="table-info-ins">
     <thead>
         <tr>
-            <td style="width: 50%;" style=" background: #480dd1;">
+            <td style="width: 50%;">
                 <label class="title-ins-label">Inscrição</label> <br>
                 <label class="title-ins-sublabel"><?php echo $reg->id; ?></label>
             </td>
@@ -177,4 +177,4 @@ $fieldOp = $app->view->regObject['fieldsOpportunity'];
 $this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
 
 
-include_once('footerPdf.php');
+//include_once('footerPdf.php');
