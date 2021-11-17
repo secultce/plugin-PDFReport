@@ -121,19 +121,52 @@ if (!empty($reg->opportunity->getFile('header')->path)) :
                         style="width: 24px;height: 24px;flex: none;order: 0;flex-grow: 0;margin: 0px 8px;"> -->
                     <?php endif; ?>
                     <br> <br>
-                    <label class="my-registration-fields">Site: </label><span><?php echo ""; ?></label><br>
-                    <label class="my-registration-fields">Nome completo: </label><span> <?php echo $reg->owner->name; ?></span><br>
-                    <label class="my-registration-fields">Data de Nascimento/Fundação: </label><span><?php echo date("d/m/Y", strtotime($reg->owner->metadata['dataDeNascimento'])); ?></span><br>
-                    <label class="my-registration-fields">Gênero: </label><span><?php echo $reg->owner->metadata['genero']; ?></span><br>
-                    <label class="my-registration-fields">Orientação Sexual: </label><span><?php echo $reg->owner->metadata['orientacaoSexual']; ?></span><br>
-                    <label class="my-registration-fields">Raça/Cor: </label><span><?php echo $reg->owner->metadata['raca']; ?></span><br>
-                    <label class="my-registration-fields">Email Privado: </label><span><?php echo $reg->owner->metadata['emailPrivado']; ?></span><br>
-                    <label class="my-registration-fields">E-mail: </label><span><?php echo $reg->owner->metadata['emailPublico']; ?></span><br>
-                    <label class="my-registration-fields">Telefone Público: </label><span><?php echo $reg->owner->metadata['telefonePublico']; ?></span><br>
-                    <label class="my-registration-fields">Telefone 1: </label><span><?php echo $reg->owner->metadata['telefone1']; ?></span><br>
-                    <label class="my-registration-fields">Telefone 2: </label><span><?php echo $reg->owner->metadata['telefone2']; ?></span><br>
-                    <label class="my-registration-fields">Currículo Lattes: </label><span><?php echo $reg->owner->metadata['curriculoLattes']; ?></span><br>
-                    <label class="my-registration-fields">Grau acadêmico: </label><span><?php echo $reg->owner->metadata['profissionais_graus_academicos']; ?></span><br>
+                    <label class="my-registration-fields">Site: </label>
+                        <span><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: ""; ?>
+                    </span><br>
+                    <label class="my-registration-fields">Nome completo: </label>
+                        <span><?php echo $reg->owner->name ? $reg->owner->name : ""; ?>
+                    </span><br>
+                    <label class="my-registration-fields">Data de Nascimento/Fundação: </label>
+                        <span>
+                            <?php echo !empty($reg->owner->metadata['dataDeNascimento'])? date("d/m/Y", strtotime($reg->owner->metadata['dataDeNascimento'])) : ""; ?>
+                        </span><br>
+                    <label class="my-registration-fields">Gênero: </label>
+                        <span><?php echo !empty($reg->owner->metadata['genero']) ? $reg->owner->metadata['genero']: ""; ?>
+                    </span><br>
+                    <label class="my-registration-fields">Orientação Sexua: </label>
+                        <span>
+                            <?php !empty($reg->owner->metadata['orientacaoSexual']) ? $reg->owner->metadata['orientacaoSexual']: ""; ?>
+                        </span><br>
+                    <label class="my-registration-fields">Raça/Cor: </label>
+                        <span>
+                            <?php !empty($reg->owner->metadata['raca']) ? $reg->owner->metadata['raca']: ""; ?>
+                        </span><br>
+                    <label class="my-registration-fields">Email Privado: </label>
+                        <span><?php !empty($reg->owner->metadata['emailPrivado']) ? $reg->owner->metadata['emailPrivado']: ""; ?>
+                    </span><br>
+                    <label class="my-registration-fields">E-mail: </label>
+                        <span>
+                            <?php !empty($reg->owner->metadata['emailPublico']) ? $reg->owner->metadata['emailPublico']: ""; ?>
+                        </span><br>
+                    <label class="my-registration-fields">Telefone Público: </label>
+                        <span>
+                            <?php !empty($reg->owner->metadata['telefonePublico']) ? $reg->owner->metadata['telefonePublico']: ""; ?>
+                        </span><br>
+                    <label class="my-registration-fields">Telefone 1: </label>
+                        <span><?php !empty($reg->owner->metadata['telefone1']) ? $reg->owner->metadata['telefone1']: ""; ?>
+                    </span><br>
+                    <label class="my-registration-fields">Telefone 2: </label>
+                        <span><?php !empty($reg->owner->metadata['telefone2']) ? $reg->owner->metadata['telefone2']: ""; ?>
+                    </span><br>
+                    <label class="my-registration-fields">Currículo Lattes: </label>
+                        <span>
+                            <?php !empty($reg->owner->metadata['curriculoLattes']) ? $reg->owner->metadata['curriculoLattes']: ""; ?>
+                        </span><br>
+                    <label class="my-registration-fields">Grau acadêmico: </label>
+                        <span>
+                            <?php !empty($reg->owner->metadata['profissionais_graus_academicos']) ? $reg->owner->metadata['profissionais_graus_academicos']: ""; ?>
+                        </span><br>
                 </div>
             </td>
         </tr>
