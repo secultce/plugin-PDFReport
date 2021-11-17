@@ -1,19 +1,22 @@
 <?php
 namespace PDFReport\Controllers;
 
+require PLUGINS_PATH.'PDFReport/vendor/autoload.php';
+require PLUGINS_PATH.'PDFReport/vendor/dompdf/dompdf/src/FontMetrics.php';
 use DateTime;
 use \MapasCulturais\App;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Mpdf\Mpdf as MPDF;
+use PDFReport\Entities\Pdf as EntitiesPdf;
 
 class Pdf extends \MapasCulturais\Controller{
 
-    function POST_gerarPdf() {
+    function GET_gerarPdf() {
+        
+        $domPdf = new Dompdf();
         $options = new Options();
         $options->setIsRemoteEnabled(true);
         $options->setIsHtml5ParserEnabled(true);
-        $domPdf = new Dompdf($options);
        
         ini_set('display_errors', 1);
         error_reporting(E_ALL);
@@ -25,32 +28,34 @@ class Pdf extends \MapasCulturais\Controller{
         $template   = "";
         //NULO PARA CASOS DE NÃO TER RECURSO
         $claimDisabled = null;
-        switch ($this->postData['selectRel']) {
+
+        switch ($this->getData['selectRel']) {
             case 0:
-                // $regs = $this->oportunityRegistrationAproved($this->postData['idopportunityReport'], 'ALL');
+                // $regs = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 'ALL');
                 // $title      = 'Relatório de inscritos na oportunidade';
                 // $template   = 'pdf/teste';
                 $_SESSION['error'] = "Ops! Selecione uma opção";
-                $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport']), 401);
+                $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
                 break;
             case 1:
-                $regs = $this->oportunityRegistrationAproved($this->postData['idopportunityReport'], 'ALL');
+                $regs = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 'ALL');
                 $title      = 'Relatório de inscritos na oportunidade';
                 $template   = 'pdf/subscribers';
+                
                 //SE VAZIO, É POR QUE NÃO TEM INSCRITO
                 if(empty($regs['regs'])){
                     $_SESSION['error'] = "Ops! Não tem inscrito nessa oportunidade.";
-                    $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport']), 401);
+                    $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
                 }
                 break;
             case 2:
                 //BUSCANDO TODOS OS REGISTROS
-                $regs = $this->oportunityRegistrationAproved($this->postData['idopportunityReport'], 10);
+                $regs = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
                 if(empty($regs['regs'])){
                     $_SESSION['error'] = "Ops! A oportunidade deve estar publicada.";
-                    $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport']), 401);
+                    $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
                 }
-                $verifyResource = $this->verifyResource($this->postData['idopportunityReport']);
+                $verifyResource = $this->verifyResource($this->getData['idopportunityReport']);
                     
                 //SE TIVER RECURSO, RECEBE O VALOR QUE ESTÁ NA TABELA
                 if(isset($verifyResource[0])){
@@ -62,7 +67,7 @@ class Pdf extends \MapasCulturais\Controller{
                 break;
             case 3:
                 //ESSE CASE, VERIFICA SE OS RECURSOS E A OPORTUNIDADE
-                $id = $this->postData['idopportunityReport'];
+                $id = $this->getData['idopportunityReport'];
                 //RETORNANDO O PERIDO DE RECURSO
                 $dqlOpMeta = "SELECT op FROM 
                 MapasCulturais\Entities\OpportunityMeta op
@@ -96,10 +101,10 @@ class Pdf extends \MapasCulturais\Controller{
                     $period = true;
                 }
                 if($period) {
-                    $regs = $this->oportunityRegistrationAproved($this->postData['idopportunityReport'], 10);
+                    $regs = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
                     if(empty($regs['regs'])){
                         $_SESSION['error'] = "Ops! Para gerar o relatório definitivo a oportunidade deve estar publicada.";
-                        $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport']), 401);
+                        $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
                     }
                     
                     //SELECT AOS RECURSOS
@@ -121,22 +126,22 @@ class Pdf extends \MapasCulturais\Controller{
                     //O PDF SOMENTE SERÁ GERADO NA EVENTUALIDADE DA AOPORTUNIDADE ESTÁ PUBLICADA E OS RECURSOS TBM ESTIVEREM PUBLICADOS
                     
                     if($countPublish == count($resource) && $countPublish > 0 && count($resource) > 0) {
-                        $regs = $this->oportunityRegistrationAproved($this->postData['idopportunityReport'], 10);
+                        $regs = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
                         $title      = 'Resultado Definitivo do Certame';
                         $template   = 'pdf/definitive';
                        
                     }elseif($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
                        
                         //SE NÃO, VOLTA PARA A PÁGINA DA OPORTUNIDADE COM AVISO
-                        //$app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport']), 401);
-                        $regs = $this->oportunityRegistrationAproved($this->postData['idopportunityReport'], 10);
+                        //$app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
+                        $regs = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
                         
                         if(empty($regs['regs'])) {
                             $_SESSION['error'] = "Ops! Você deve publicar a oportunidade para esse relatório";
-                            $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport'].'#/tab=inscritos'), 401);
+                            $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos'), 401);
                         }
                         //VERIFICANDO SE TEM RECURSO
-                        $verifyResource = $this->verifyResource($this->postData['idopportunityReport']);
+                        $verifyResource = $this->verifyResource($this->getData['idopportunityReport']);
                         
                         //SE TIVER RECURSO, RECEBE O VALOR QUE ESTÁ NA TABELA
                         if(isset($verifyResource[0])){
@@ -154,25 +159,25 @@ class Pdf extends \MapasCulturais\Controller{
                             $title      = 'Resultado Definitivo do Certame';
                             $template   = 'pdf/definitive';
                         }else{
-                            $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport'].'#/tab=inscritos'), 401);
+                            $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos'), 401);
                         }
                     
                     }
                 }else{
                     $_SESSION['error'] = "Ops! Ocorreu um erro inesperado.";
-                    $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport'].'#/tab=inscritos'), 401);
+                    $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos'), 401);
                 }
                 break;
             case 4:
-                $regs = $this->oportunityRegistrationAproved($this->postData['idopportunityReport'], 10);
+                $regs = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
                 if(empty($regs['regs'])){
-                    $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport']), 401);
+                    $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
                 }
                 $title      = 'Relatório de contato';
                 $template   = 'pdf/contact';
                 break;
             default:
-                $app->redirect($app->createUrl('oportunidade/'.$this->postData['idopportunityReport']), 401);
+                $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
                 break;
         }
         // dump(getType($regs));
@@ -180,6 +185,7 @@ class Pdf extends \MapasCulturais\Controller{
         $app->view->jsObject['subscribers'] = $regs['regs'];
         $app->view->jsObject['title'] = $title;
         $app->view->jsObject['claimDisabled'] = $claimDisabled;
+ 
         $app->render($template); 
         // $content = $app->view->fetch($template);
         
@@ -228,16 +234,54 @@ class Pdf extends \MapasCulturais\Controller{
         return $opp;
     }
 
-    function GET_gerarFpdf() {
+    function GET_minha_inscricao() {
         ini_set('display_errors', 1);
-        error_reporting(E_ALL);
-        //require(PROTECTED_PATH.'vendor/setasign/fpdf/fpdf.php');
-        $mpdf = new MPDF(['orientation' => 'L']);
-        header("Content-type:application/pdf");
-        echo '<h1>Hello world!</h1>';
-        // $mpdf->WriteHTML('<h1>Hello world!</h1>');
-        // $mpdf->Output();
-        // header('Content-Type: application/pdf');
+        $app = App::i();
+        $domPdf = new Dompdf();
+
+        $reg = $app->repo('Registration')->find($this->data['id']);
+        //INSTANCIA DO TIPO ARRAY OBJETO
+        $app->view->regObject = new \ArrayObject;
+        $app->view->regObject['ins'] = $reg;
+        $fields = [];
+        //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
+        foreach ($reg->opportunity->registrationFieldConfigurations as $field) {
+            array_push($fields , [
+                        'id' => $field->id,
+                        'title' => $field->title,
+                        'description' => $field->description,
+                        'fieldType' => $field->fieldType,
+                        'config' => $field->config
+                    ]);
+        }
+        //ORDENANDO O ARRAY EM ORDEM DE ID
+        sort($fields);
+        $registrationFieldConfigurations = $fields;
+        $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
+        
+        $template   = 'pdf/my-registration';
+        //$app->render($template);
+        $content = $app->view->fetch($template);
+        $domPdf->setBasePath(PLUGINS_PATH.'PDFReport/assets/css');
+        $domPdf->loadHtml($content);
+        $domPdf->setPaper('A4', 'portrait');
+        
+        $domPdf->render();
+
+        $font = $domPdf->getFontMetrics()->getFont("Arial, Helvetica, sans-serif", "normal");
+        $size = 8;
+        $pageText = "Pagina {PAGE_NUM} de {PAGE_COUNT}";
+        $domPdf->getCanvas()->page_text(180, 800, "Escola de Saúde Pública do Ceará Paulo Marcelo Martins Rodrigues.", $font, $size, array(0,0,0)); 
+        $domPdf->getCanvas()->page_text(210, 810, "Av. Antônio justa, 3161 - Meireles. CEP: 60.165-090", $font, $size, array(0,0,0)); 
+        $domPdf->getCanvas()->page_text(230, 820, "Fortaleza / CE. Fone: (85) 3101.1398", $font, $size, array(0,0,0)); 
+        // $y = $domPdf->get_height() - 20;
+        // $x = $domPdf->get_width() - 15 - $domPdf->getFontMetrics()->getTextWidth($pageText, $font, $size);
+        // $domPdf->text($x, $y, $pageText, $font, $size);
+
+        $domPdf->stream("relatorio.pdf", array("Attachment" => false));
+        exit(0);
+
     }
 
+    
 }

@@ -2,17 +2,64 @@
     $this->layout = 'nolayout'; 
     $sub = $app->view->jsObject['subscribers'];
     $nameOpportunity = $sub[0]->opportunity->name;
+    //Objeto Oportunidade
+    $op = $app->view->jsObject['opp'];
+    include_once('style.php');  
+    // dump($sub);
+    // die;
 ?>
-
+</style>
 <div class="container">
     <?php include_once('header.php'); ?>
-    <table class="table table-striped table-bordered">
+    
+
+    <table width="100%" style="height: 100px; margin-bottom:40px;">
         <thead>
-            <tr class ="cert-background" style="background: #009353 !important; color:black">
+            <tr class="">
+                <td style="width: 10%;">                   
+
+                    <!-- <img src="<?php $this->asset('img/logo-saude.png') ?>"  class="pull-left" > -->
+                    <?php if(!empty($op->files['avatar'])): ?>
+                        <img src="<?php echo $op->files['avatar']->path; ?>"  style="width: 80px; height: 80px;">
+                    <?php else: ?>
+                        <img src="<?php echo THEMES_PATH.'BaseV1/assets/img/avatar--opportunity.png'; ?>" style="width: 80px; height: 80px;">
+                    <!-- <label for=""><?php echo THEMES_PATH.'BaseV1/assets/img/avatar--opportunity.png'; ?></label> -->
+                    <?php endif; ?>
+
+                </td>
+                <td style="width: 90%;">
+                <!-- <img src="<?php $this->asset('img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png') ?>" class="pull-right" alt=""> -->
+                    <label for="" class="title-edital">Edital</label><br>
+                    <label class="sub-title-edital"><?php echo $op->ownerEntity->name; ?></label>
+                    <br>
+                    <label for="" class="title-edital">Oportunidade</label><br>
+                    <label class="sub-title-edital"><?php echo $op->name; ?></label>
+                </td>
+            </tr>
+        </thead>
+    </table>
+
+    <div class="row">
+        <div class="container">
+            <div class="col-md-12" class="div-categoria" style="background: #1F4E37; border-radius: 8px;color: #FFFFFF;
+padding: 4px 8px;">
+                <label for="">Categoiria 01</label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <br>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="container">
+        <br>
+        <table class="table table-striped table-bordered">
+        <thead>
+            <tr style="color: #2D3540;">
                 <th>Inscrição</th>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Enviado em</th>
+                <th>Agente</th>
+                <th>Aval. Preliminar</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -20,10 +67,9 @@
             <?php foreach ($sub as $key => $value) {
                 $agent = $app->repo('Agent')->find($value->owner->id); ?>
             <tr>
-                <td class="text-center"><?php echo $value->number; ?></td>
+                <td><?php echo $value->number; ?></td>
                 <td><?php echo $agent->name; ?></td>
-                <td><?php echo $value->category; ?></td>
-                <td><?php ($value->sentTimestamp == null) ? "" : printf($value->sentTimestamp->format('d/m/Y')); ?></td>
+                <td><?php echo $value->preliminaryResult; ?></td>
                 <td><?php
                     $status = '';
                         switch ($value->status) {
@@ -52,5 +98,9 @@
             <?php } ?>
         </tbody>
     </table>
+        </div>
+    </div>
+
+
 </div>
-<?php include_once('footer.php'); ?>
+<?php //include_once('footer.php'); ?>
