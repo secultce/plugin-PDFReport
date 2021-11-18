@@ -56,18 +56,29 @@ include_once('header.php');
                         style="width: 80px; height: 80px; border: 1px solid black; margin-right: 8px">
                     <?php else : ?>
                     <img src="<?php echo THEMES_PATH . 'BaseV1/assets/img/avatar--opportunity.png'; ?>"
-                        style="width: 80px; height: 80px;">
+                        style="width: 80px; height: 80px;margin:8px;">
                     <!-- <label for=""><?php echo THEMES_PATH . 'BaseV1/assets/img/avatar--opportunity.png'; ?></label> -->
                     <?php endif; ?>
 
                 </td>
                 <td style="width: 90%;">
                     <!-- <img src="<?php $this->asset('img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png') ?>" class="pull-right" alt=""> -->
-                    <label for=""><strong>Edital</strong></label><br>
-                    <label class="sub-title-edital"><?php echo $reg->opportunity->ownerEntity->name; ?></label>
-                    <br>
-                    <label for="" class="title-edital">Oportunidade</label><br>
-                    <label class="sub-title-edital"><?php echo $reg->opportunity->name; ?></label>
+                    <div>
+                    <div class="title-edital">
+                        <label class="">Edital</label><br>
+                    </div>
+                    <div class="sub-title-edital">
+                        <label class=""><?php echo $reg->opportunity->ownerEntity->name; ?></label>
+                    </div>
+                    </div>
+                    <div>
+                        <div class="title-edital">
+                            <label for="" class="title-edital">Oportunidade</label><br>
+                        </div>
+                        <div class="sub-title-edital">
+                            <label class="sub-title-edital"><?php echo $reg->opportunity->name; ?></label>
+                        </div>
+                    </div>
                 </td>
             </tr>
         </thead>
@@ -92,69 +103,72 @@ include_once('header.php');
             Agente responsável pela inscrição
         </h4>
         <br>
-        <?php if(!empty($reg->owner->avatar)): ?>
-        <img src="<?php echo $reg->owner->avatar->transform('avatarSmall')->url ?>" alt="">
-        <?php else: ?>
-            <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/avatar--agent.png'; ?>" alt="" style="width: 50px; height: 50px;flex: none;order: 0;flex-grow: 0;margin: 8px 8px;background: #CCCCCC;">
-            <label style="font-size: 12px;line-height: 9px;color: rgba(0, 0, 0, 0.87);
-                        font-style: normal;font-weight: normal;letter-spacing: 0.5px;
-                        align-items: center;">
-            <?php echo $reg->number; ?>
-            
-                
-        </label>
-
-        
-        <!-- <img src="<?php $this->asset('img/avatar--agent.png') ?>" alt=""
-                        style="width: 24px;height: 24px;flex: none;order: 0;flex-grow: 0;margin: 0px 8px;"> -->
-        <?php endif; ?>
+        <div id="my-info-registration">
+            <?php if(!empty($reg->owner->avatar)): ?>
+            <img src="<?php echo $reg->owner->avatar->transform('avatarSmall')->url ?>" alt="">
+            <?php else: ?>
+                <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/avatar--agent.png'; ?>" alt="" 
+                style="width: 35px; height: 35px;margin: 8px 8px;background: #CCCCCC;float:left;
+                 ">
+                 
+            <?php endif; ?>
+                <div id="numer_registration">
+                <label>
+                    <?php echo $reg->number; ?>
+                </label>
+                </div>
+        </div>
         <br> <br>
-        <label class="my-registration-fields">Site: </label>
-        <span><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: ""; ?>
+        <div  class="my-conten-agent">
+        <span class="my-registration-fields"> Site:  </span>
+        <span ><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: ""; ?>
         </span><br>
-        <label class="my-registration-fields">Nome completo: </label>
-        <span><?php echo $reg->owner->name ? $reg->owner->name : ""; ?>
+        <span class="my-registration-fields">Nome completo: </span>
+        <span ><?php echo $reg->owner->name ? $reg->owner->name : ""; ?>
         </span><br>
-        <label class="my-registration-fields">Data de Nascimento/Fundação: </label>
-        <span>
+        <span class="my-registration-fields">Data de Nascimento/Fundação: </span>
+        <span  class="my-registration-fields-span">
             <?php echo !empty($reg->owner->metadata['dataDeNascimento'])? date("d/m/Y", strtotime($reg->owner->metadata['dataDeNascimento'])) : ""; ?>
         </span><br>
-        <label class="my-registration-fields">Gênero: </label>
-        <span><?php echo !empty($reg->owner->metadata['genero']) ? $reg->owner->metadata['genero']: ""; ?>
-        </span><br>
-        <label class="my-registration-fields">Orientação Sexua: </label>
-        <span>
+        <span class="my-registration-fields">Gênero: </span>
+            <span  class="my-registration-fields-span">
+                <?php echo !empty($reg->owner->metadata['genero']) ? $reg->owner->metadata['genero']: ""; ?>
+            </span><br>
+        <span class="my-registration-fields">Orientação Sexual: </span>
+        <span  class="my-registration-fields-span">
             <?php !empty($reg->owner->metadata['orientacaoSexual']) ? $reg->owner->metadata['orientacaoSexual']: ""; ?>
         </span><br>
-        <label class="my-registration-fields">Raça/Cor: </label>
-        <span>
-            <?php !empty($reg->owner->metadata['raca']) ? $reg->owner->metadata['raca']: ""; ?>
-        </span><br>
-        <label class="my-registration-fields">Email Privado: </label>
-        <span><?php !empty($reg->owner->metadata['emailPrivado']) ? $reg->owner->metadata['emailPrivado']: ""; ?>
-        </span><br>
-        <label class="my-registration-fields">E-mail: </label>
-        <span>
-            <?php !empty($reg->owner->metadata['emailPublico']) ? $reg->owner->metadata['emailPublico']: ""; ?>
-        </span><br>
-        <label class="my-registration-fields">Telefone Público: </label>
-        <span>
+        <span class="my-registration-fields">Raça/Cor: </span>
+            <span  class="my-registration-fields-span">
+                <?php !empty($reg->owner->metadata['raca']) ? $reg->owner->metadata['raca']: ""; ?>
+            </span><br>
+        <span class="my-registration-fields">Email Privado: </span>
+            <span  class="my-registration-fields-span">
+                <?php !empty($reg->owner->metadata['emailPrivado']) ? $reg->owner->metadata['emailPrivado']: ""; ?>
+            </span><br>
+        <span class="my-registration-fields">E-mail: </span>
+            <span  class="my-registration-fields-span">
+                <?php !empty($reg->owner->metadata['emailPublico']) ? $reg->owner->metadata['emailPublico']: ""; ?>
+            </span><br>
+        <span class="my-registration-fields">Telefone Público: </span>
+        <span  class="my-registration-fields-span">
             <?php !empty($reg->owner->metadata['telefonePublico']) ? $reg->owner->metadata['telefonePublico']: ""; ?>
         </span><br>
-        <label class="my-registration-fields">Telefone 1: </label>
-        <span><?php !empty($reg->owner->metadata['telefone1']) ? $reg->owner->metadata['telefone1']: ""; ?>
-        </span><br>
-        <label class="my-registration-fields">Telefone 2: </label>
-        <span><?php !empty($reg->owner->metadata['telefone2']) ? $reg->owner->metadata['telefone2']: ""; ?>
-        </span><br>
-        <label class="my-registration-fields">Currículo Lattes: </label>
-        <span>
+        <span class="my-registration-fields">Telefone 1: </span>
+            <span  class="my-registration-fields-span"><?php !empty($reg->owner->metadata['telefone1']) ? $reg->owner->metadata['telefone1']: ""; ?>
+            </span><br>
+        <span class="my-registration-fields">Telefone 2: </span>
+            <span  class="my-registration-fields-span"><?php !empty($reg->owner->metadata['telefone2']) ? $reg->owner->metadata['telefone2']: ""; ?>
+            </span><br>
+        <span class="my-registration-fields">Currículo Lattes: </span>
+        <span  class="my-registration-fields-span">
             <?php !empty($reg->owner->metadata['curriculoLattes']) ? $reg->owner->metadata['curriculoLattes']: ""; ?>
-        </span><br>
-        <label class="my-registration-fields">Grau acadêmico: </label>
-        <span>
+            </span><br>
+        <span class="my-registration-fields">Grau acadêmico: </span>
+            <span class="my-registration-fields-span">
             <?php !empty($reg->owner->metadata['profissionais_graus_academicos']) ? $reg->owner->metadata['profissionais_graus_academicos']: ""; ?>
-        </span><br>
+            </span><br>
+        </div>
     </div>
     <?php
 $fieldOp = $app->view->regObject['fieldsOpportunity'];
