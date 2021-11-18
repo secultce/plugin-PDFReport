@@ -8,7 +8,8 @@
             </td>
             <td width="50%" style="float:right;">
             <!-- <img src="<?php $this->asset('img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png') ?>" class="pull-right" alt=""> -->
-                <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png'; ?>"  style="float:right;"/>
+                <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png'; ?>" 
+                 style="margin-left: 100px"/>
             </td>
         </tr>
     </thead>

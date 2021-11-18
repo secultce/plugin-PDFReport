@@ -27,7 +27,7 @@ use PDFReport\Entities\Pdf;
             ?>
     </span>
     <span style="width: 20px; text-align: justify-all;"><?php 
-        $valueMeta = Pdf::getValueField($fields['id']); 
+        $valueMeta = Pdf::getValueField($fields['id'], $reg->id); 
         foreach ($valueMeta as $keyMeta => $valueMeta) {
             
             if($fields['fieldType'] == 'checkbox' && $valueMeta->value == true) {                                   
@@ -42,6 +42,10 @@ use PDFReport\Entities\Pdf;
             if($fields['fieldType'] == 'select') {
                 echo $valueMeta->value;
             }
+
+            // if($fields['fieldType'] == 'space-field') {
+            //     echo 'space-field';
+            // }
         }
                             
         /**
@@ -63,3 +67,4 @@ use PDFReport\Entities\Pdf;
     ?>
 
 </div>
+    </main>

@@ -14,11 +14,8 @@ include_once('header.php');
                     <img src="<?php echo $reg->opportunity->getFile('header')->path; ?>" alt="">
                 </div>
                 </header>
-                <?php else : ?>
-                <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/backgroud_header_report_opp.png'; ?>"
-                    style="float:left;  width: 650px" />
-                <!-- <img src="<?php //$this->asset('img/backgroud_header_report_opp.png') ?>" alt=""> -->
                 <?php endif; ?>
+                
             </td>
         </tr>
         <thead>
@@ -45,20 +42,15 @@ include_once('header.php');
         <thead>
             <tr class="">
                 <td style="width: 10%;">
-
-                    <!-- <img src="<?php $this->asset('img/logo-saude.png') ?>"  class="pull-left" > -->
                     <?php if (!empty($reg->opportunity->files['avatar'])) : ?>
                     <img src="<?php echo $reg->opportunity->files['avatar']->path; ?>"
-                        style="width: 80px; height: 80px; border: 1px solid black; margin-right: 8px">
+                        style="width: 80px; height: 80px; border: 1px solid #c5c5c5; margin-right: 8px">
                     <?php else : ?>
                     <img src="<?php echo THEMES_PATH . 'BaseV1/assets/img/avatar--opportunity.png'; ?>"
                         style="width: 80px; height: 80px;margin:8px;">
-                    <!-- <label for=""><?php echo THEMES_PATH . 'BaseV1/assets/img/avatar--opportunity.png'; ?></label> -->
                     <?php endif; ?>
-
                 </td>
                 <td style="width: 90%;">
-                    <!-- <img src="<?php $this->asset('img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png') ?>" class="pull-right" alt=""> -->
                     <div>
                     <div class="title-edital">
                         <label class="">Edital</label><br>
@@ -104,7 +96,7 @@ include_once('header.php');
             <img src="<?php echo $reg->owner->avatar->transform('avatarSmall')->url ?>" alt="">
             <?php else: ?>
                 <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/avatar--agent.png'; ?>" alt="" 
-                style="width: 35px; height: 35px;margin: 8px 8px;background: #CCCCCC;float:left;
+                style="width: 35px; height: 35px;margin: 5px 5px;background: #CCCCCC;float:left;
                  ">
                  
             <?php endif; ?>
@@ -114,7 +106,7 @@ include_once('header.php');
                 </label>
                 </div>
         </div>
-        <br> <br>
+        <br>
         <div  class="my-conten-agent">
         <span class="my-registration-fields"> Site:  </span>
         <span ><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: ""; ?>
@@ -169,6 +161,3 @@ include_once('header.php');
     <?php
 $fieldOp = $app->view->regObject['fieldsOpportunity'];
 $this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
-
-
-//include_once('footerPdf.php');
