@@ -238,28 +238,46 @@ class Pdf extends \MapasCulturais\Controller{
     function GET_minha_inscricao() {
         ini_set('display_errors', 1);
         $app = App::i();
+        //SOMENTE AUTENTICADO
+        if($app->user->is('guest')){
+            $app->auth->requireAuthentication();
+        }
 
         $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
         'format' => 'A4',
         'orientation' => 'L']);
-
+        
         $reg = $app->repo('Registration')->find($this->data['id']);
+       
+        //SE O DONO DA INSCRIÇÃO NAO FOR O MESMO LOGADO, ENTÃO NÃO TEM PERMISSÃO DE ACESSAR.
+        if($reg->owner->userId != $app->user->id) {
+           //SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR
+            if(!$app->user->is('admin')){
+                $_SESSION['error'] = "Ops! Você não tem permissão";               
+                $app->redirect($app->request()->getReferer(), 403);            
+            }
+        }
+       
         //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
         $fields = [];
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
         foreach ($reg->opportunity->registrationFieldConfigurations as $field) {
+            
             array_push($fields , [
                         'id' => $field->id,
                         'title' => $field->title,
                         'description' => $field->description,
                         'fieldType' => $field->fieldType,
-                        'config' => $field->config
+                        'config' => $field->config,
+                        'owner' => $field->owner
                     ]);
         }
+        
         //ORDENANDO O ARRAY EM ORDEM DE ID
         sort($fields);
+
         $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
 
@@ -268,22 +286,22 @@ class Pdf extends \MapasCulturais\Controller{
         ob_start();
         $content = $app->view->fetch($template);
 
-        $footer = '<div>
-        <p style="text-align: center; font-size: 10px;"><span>Escola de Saúde Pública do Ceará Paulo Marcelo</spn></p>
+        $footer = '<div style="border-top: 1px solid #c5c5c5;">
+        <p style="text-align: center; font-size: 10px;"><span>Escola de Saúde Pública do Ceará Paulo Marcelo Martins Rodrigues</span></p>
+        <p style="text-align: center; font-size: 10px;"><span>Av. Antônio Justa, 3161 - Meireles - CEP: 60.165-090</span></p>
+        <p style="text-align: center; font-size: 10px;"><span>Fortaleza / CE - Fone: (85) 3101.1398</span></p>
         </div>';
                 
         $mpdf->SetHTMLFooter($footer);
         $mpdf->SetHTMLFooter($footer, 'E');
         $mpdf->writingHTMLfooter = true;
-        // dump($mpdf);
-        // die;
         //$mpdf->SetDisplayMode('fullpage');
+        $mpdf->SetTitle('');
         $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
         $mpdf->WriteHTML(ob_get_clean());
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
         $mpdf->Output();
-        //header("Content-type: application/pdf");
         exit;
     }
 
