@@ -1,5 +1,6 @@
 {
     "require": {
-        "dompdf/dompdf": "0.8.5"
+        "dompdf/dompdf": "0.8.5",
+        "mpdf/mpdf": "7.0.0"
     }
 }

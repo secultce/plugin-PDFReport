@@ -8,6 +8,7 @@ use \MapasCulturais\App;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use PDFReport\Entities\Pdf as EntitiesPdf;
+use Mpdf\Mpdf;
 
 class Pdf extends \MapasCulturais\Controller{
 
@@ -237,50 +238,71 @@ class Pdf extends \MapasCulturais\Controller{
     function GET_minha_inscricao() {
         ini_set('display_errors', 1);
         $app = App::i();
-        $domPdf = new Dompdf();
+        //SOMENTE AUTENTICADO
+        if($app->user->is('guest')){
+            $app->auth->requireAuthentication();
+        }
 
+        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
+        'format' => 'A4',
+        'orientation' => 'L']);
+        
         $reg = $app->repo('Registration')->find($this->data['id']);
+       
+        //SE O DONO DA INSCRIÇÃO NAO FOR O MESMO LOGADO, ENTÃO NÃO TEM PERMISSÃO DE ACESSAR.
+        if($reg->owner->userId != $app->user->id) {
+           //SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR
+            if(!$app->user->is('admin')){
+                $_SESSION['error'] = "Ops! Você não tem permissão";               
+                $app->redirect($app->request()->getReferer(), 403);            
+            }
+        }
+       
         //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
         $fields = [];
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
         foreach ($reg->opportunity->registrationFieldConfigurations as $field) {
+            
             array_push($fields , [
                         'id' => $field->id,
                         'title' => $field->title,
                         'description' => $field->description,
                         'fieldType' => $field->fieldType,
-                        'config' => $field->config
+                        'config' => $field->config,
+                        'owner' => $field->owner
                     ]);
         }
+        
         //ORDENANDO O ARRAY EM ORDEM DE ID
         sort($fields);
+
         $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
-        
+
         $template   = 'pdf/my-registration';
         //$app->render($template);
+        ob_start();
         $content = $app->view->fetch($template);
-        $domPdf->setBasePath(PLUGINS_PATH.'PDFReport/assets/css');
-        $domPdf->loadHtml($content);
-        $domPdf->setPaper('A4', 'portrait');
-        
-        $domPdf->render();
 
-        $font = $domPdf->getFontMetrics()->getFont("Arial, Helvetica, sans-serif", "normal");
-        $size = 8;
-        $pageText = "Pagina {PAGE_NUM} de {PAGE_COUNT}";
-        $domPdf->getCanvas()->page_text(180, 800, "Escola de Saúde Pública do Ceará Paulo Marcelo Martins Rodrigues.", $font, $size, array(0,0,0)); 
-        $domPdf->getCanvas()->page_text(210, 810, "Av. Antônio justa, 3161 - Meireles. CEP: 60.165-090", $font, $size, array(0,0,0)); 
-        $domPdf->getCanvas()->page_text(230, 820, "Fortaleza / CE. Fone: (85) 3101.1398", $font, $size, array(0,0,0)); 
-        // $y = $domPdf->get_height() - 20;
-        // $x = $domPdf->get_width() - 15 - $domPdf->getFontMetrics()->getTextWidth($pageText, $font, $size);
-        // $domPdf->text($x, $y, $pageText, $font, $size);
-
-        $domPdf->stream("relatorio.pdf", array("Attachment" => false));
-        exit(0);
-
+        $footer = '<div style="border-top: 1px solid #c5c5c5;">
+        <p style="text-align: center; font-size: 10px;"><span>Escola de Saúde Pública do Ceará Paulo Marcelo Martins Rodrigues</span></p>
+        <p style="text-align: center; font-size: 10px;"><span>Av. Antônio Justa, 3161 - Meireles - CEP: 60.165-090</span></p>
+        <p style="text-align: center; font-size: 10px;"><span>Fortaleza / CE - Fone: (85) 3101.1398</span></p>
+        </div>';
+                
+        $mpdf->SetHTMLFooter($footer);
+        $mpdf->SetHTMLFooter($footer, 'E');
+        $mpdf->writingHTMLfooter = true;
+        //$mpdf->SetDisplayMode('fullpage');
+        $mpdf->SetTitle('');
+        $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
+        $mpdf->WriteHTML(ob_get_clean());
+        $mpdf->WriteHTML($stylesheet,1);
+        $mpdf->WriteHTML($content,2);
+        $mpdf->Output();
+        exit;
     }
 
     

@@ -7,10 +7,13 @@ use MapasCulturais\RegistrationMeta;
 
 class Pdf extends \MapasCulturais\Entity{
 
-    static public  function getValueField($id) {
+    static public  function getValueField($id, $registration) {
         $app = App::i();
         $body = 'field_'.$id;
-        return $app->repo('RegistrationMeta')->findBy(['key' => $body]);
+        return $app->repo('RegistrationMeta')->findBy([
+            'key' => $body,
+            'owner' => $registration
+        ]);
               
     }
 
