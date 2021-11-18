@@ -265,10 +265,21 @@ class Pdf extends \MapasCulturais\Controller{
 
         $template   = 'pdf/my-registration';
         //$app->render($template);
+        ob_start();
         $content = $app->view->fetch($template);
 
-        $mpdf->SetDisplayMode('fullpage');
+        $footer = '<div>
+        <p style="text-align: center; font-size: 10px;"><span>Escola de Saúde Pública do Ceará Paulo Marcelo</spn></p>
+        </div>';
+                
+        $mpdf->SetHTMLFooter($footer);
+        $mpdf->SetHTMLFooter($footer, 'E');
+        $mpdf->writingHTMLfooter = true;
+        // dump($mpdf);
+        // die;
+        //$mpdf->SetDisplayMode('fullpage');
         $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
+        $mpdf->WriteHTML(ob_get_clean());
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
         $mpdf->Output();

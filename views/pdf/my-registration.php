@@ -2,12 +2,8 @@
 $this->layout = 'nolayout';
 $reg = $app->view->regObject['ins'];
 
-include_once('header.php');  
-
-
-
+include_once('header.php'); 
 ?>
-
 <table width="100%" style="height: 100px; margin-bottom: 24px; margin-top: 24px; width: 100%;">
     <thead>
         <tr>
