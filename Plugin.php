@@ -9,7 +9,7 @@ class Plugin extends \MapasCulturais\Plugin {
 
         // add hooks
         $app = App::i();
-
+        
         //
         $app->hook('template(opportunity.single.header-inscritos):end', function () use ($app) {
             $app->view->enqueueScript('app', 'pdfreport', 'js/pdfreport.js');
@@ -28,6 +28,12 @@ class Plugin extends \MapasCulturais\Plugin {
             }
             $this->part('reports/buttons-report',['resource' => $resource]);
         });
+
+        $app->hook('template(registration.<<*>>.form):end', function () use ($app) {
+            $id = $this->data['entity']->id;
+            $this->part('reports/button-print', ['id' => $id]);
+        });
+       
     }
 
     public function register() {
