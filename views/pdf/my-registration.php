@@ -31,7 +31,13 @@ include_once('header.php');
                 </div>
                 <div class="col-md-6  title-ins-sublabel-right" style="width: 50%;float: left;">
                     <label class="title-ins-sublabel">
-                        Registrada no dia: <?php echo $reg->sentTimestamp->format('d/m/Y'); ?>
+                        <?php 
+                        if(isset($reg->sentTimestamp) && !empty($reg->sentTimestamp)) {
+                            echo "Registrada no dia: " . $reg->sentTimestamp->format('d/m/Y');
+                        }else{
+                            echo "Inscrição em Rascunho";
+                        }
+                        ?>
                     </label> <br>
                 </div>
             </div>
@@ -109,52 +115,52 @@ include_once('header.php');
         <br>
         <div  class="my-conten-agent">
         <span class="my-registration-fields"> Site:  </span>
-        <span ><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: ""; ?>
+        <span ><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: "Não informado"; ?>
         </span><br>
         <span class="my-registration-fields">Nome completo: </span>
-        <span ><?php echo $reg->owner->name ? $reg->owner->name : ""; ?>
+        <span ><?php echo $reg->owner->name ? $reg->owner->name : "Não informado"; ?>
         </span><br>
         <span class="my-registration-fields">Data de Nascimento/Fundação: </span>
         <span  class="my-registration-fields-span">
-            <?php echo !empty($reg->owner->metadata['dataDeNascimento'])? date("d/m/Y", strtotime($reg->owner->metadata['dataDeNascimento'])) : ""; ?>
+            <?php echo !empty($reg->owner->metadata['dataDeNascimento'])? date("d/m/Y", strtotime($reg->owner->metadata['dataDeNascimento'])) : "Não informado"; ?>
         </span><br>
         <span class="my-registration-fields">Gênero: </span>
             <span  class="my-registration-fields-span">
-                <?php echo !empty($reg->owner->metadata['genero']) ? $reg->owner->metadata['genero']: ""; ?>
+                <?php echo !empty($reg->owner->metadata['genero']) ? $reg->owner->metadata['genero']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Orientação Sexual: </span>
         <span  class="my-registration-fields-span">
-            <?php !empty($reg->owner->metadata['orientacaoSexual']) ? $reg->owner->metadata['orientacaoSexual']: ""; ?>
+            <?php echo !empty($reg->owner->metadata['orientacaoSexual']) ? $reg->owner->metadata['orientacaoSexual']: "Não informado"; ?>
         </span><br>
         <span class="my-registration-fields">Raça/Cor: </span>
             <span  class="my-registration-fields-span">
-                <?php !empty($reg->owner->metadata['raca']) ? $reg->owner->metadata['raca']: ""; ?>
+                <?php echo !empty($reg->owner->metadata['raca']) ? $reg->owner->metadata['raca']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Email Privado: </span>
             <span  class="my-registration-fields-span">
-                <?php !empty($reg->owner->metadata['emailPrivado']) ? $reg->owner->metadata['emailPrivado']: ""; ?>
+                <?php echo !empty($reg->owner->metadata['emailPrivado']) ? $reg->owner->metadata['emailPrivado']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">E-mail: </span>
             <span  class="my-registration-fields-span">
-                <?php !empty($reg->owner->metadata['emailPublico']) ? $reg->owner->metadata['emailPublico']: ""; ?>
+                <?php echo !empty($reg->owner->metadata['emailPublico']) ? $reg->owner->metadata['emailPublico']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Telefone Público: </span>
         <span  class="my-registration-fields-span">
-            <?php !empty($reg->owner->metadata['telefonePublico']) ? $reg->owner->metadata['telefonePublico']: ""; ?>
+            <?php echo !empty($reg->owner->metadata['telefonePublico']) ? $reg->owner->metadata['telefonePublico']: "Não informado"; ?>
         </span><br>
         <span class="my-registration-fields">Telefone 1: </span>
-            <span  class="my-registration-fields-span"><?php !empty($reg->owner->metadata['telefone1']) ? $reg->owner->metadata['telefone1']: ""; ?>
+            <span  class="my-registration-fields-span"><?php echo !empty($reg->owner->metadata['telefone1']) ? $reg->owner->metadata['telefone1']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Telefone 2: </span>
-            <span  class="my-registration-fields-span"><?php !empty($reg->owner->metadata['telefone2']) ? $reg->owner->metadata['telefone2']: ""; ?>
+            <span  class="my-registration-fields-span"><?php echo !empty($reg->owner->metadata['telefone2']) ? $reg->owner->metadata['telefone2']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Currículo Lattes: </span>
         <span  class="my-registration-fields-span">
-            <?php !empty($reg->owner->metadata['curriculoLattes']) ? $reg->owner->metadata['curriculoLattes']: ""; ?>
+            <?php echo !empty($reg->owner->metadata['curriculoLattes']) ? $reg->owner->metadata['curriculoLattes']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Grau acadêmico: </span>
             <span class="my-registration-fields-span">
-            <?php !empty($reg->owner->metadata['profissionais_graus_academicos']) ? $reg->owner->metadata['profissionais_graus_academicos']: ""; ?>
+            <?php echo !empty($reg->owner->metadata['profissionais_graus_academicos']) ? $reg->owner->metadata['profissionais_graus_academicos']: "Não informado"; ?>
             </span><br>
         </div>
     </div>

@@ -30,17 +30,29 @@ use PDFReport\Entities\Pdf;
         $valueMeta = Pdf::getValueField($fields['id'], $reg->id); 
         foreach ($valueMeta as $keyMeta => $valueMeta) {
             
-            if($fields['fieldType'] == 'checkbox' && $valueMeta->value == true) {                                   
-                echo $fields['description'];
-            }
-
-            if($fields['fieldType'] == 'cnpj') {
+            if($fields['fieldType'] == 'checkbox') {  
+                if($valueMeta->value) {
+                    echo $fields['description'];
+                }else{
+                    echo "Não informado";
+                }
+            }else if($fields['fieldType'] == 'cnpj') {
                 $cnpj = Pdf::mask($valueMeta->value,'##.###.###/####-##');
                 echo $cnpj;
-            }
 
-            if($fields['fieldType'] == 'select') {
+            }else if($fields['fieldType'] == 'persons') {
+
+                $persons = json_decode($valueMeta->value, true);
+                $namesPersons = [];
+                foreach($persons as $person) {
+                    $namesPersons[] = $person['name'];
+                }
+                echo implode(", ", $namesPersons);
+
+            }else{
+
                 echo $valueMeta->value;
+
             }
 
             // if($fields['fieldType'] == 'space-field') {
@@ -56,8 +68,10 @@ use PDFReport\Entities\Pdf;
         //VERIFICANDO SE É O CAMPO É agent-owner-field
         if($fields['fieldType'] == 'agent-owner-field') {
             //PASSANDO O VALOR QUE VEM EM CONFIG PARA SABER SE TEM O VALOR DENTRO DO ARRAY $agentMetaData
-            if(array_key_exists($fields['config']['entityField'], $agentMetaData['owner'])) {
-                print_r($agentMetaData['owner'][$fields['config']['entityField']]);
+            if(isset($agentMetaData['owner'])) {
+                if(array_key_exists($fields['config']['entityField'], $agentMetaData['owner'])) {
+                    print_r($agentMetaData['owner'][$fields['config']['entityField']]);
+                } 
             }
         }
 
