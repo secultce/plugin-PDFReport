@@ -1,5 +1,6 @@
 <?php
-$this->layout = 'nolayout';
+$this->layout = 'nolayout-pdf';
+
 $reg = $app->view->regObject['ins'];
 
 include_once('header.php'); 
@@ -9,16 +10,13 @@ include_once('header.php');
         <tr>
             <td>
                 <?php if (!empty($reg->opportunity->getFile('header'))) : ?>
-
-                <div>
-                    <img src="<?php echo $reg->opportunity->getFile('header')->path; ?>" alt="">
-                </div>
-                </header>
+                    <div>
+                        <img src="<?php echo $reg->opportunity->getFile('header')->path; ?>" alt="">
+                    </div>
                 <?php endif; ?>
-                
             </td>
         </tr>
-        <thead>
+    </thead>
 </table>
 
 <main>
@@ -32,11 +30,7 @@ include_once('header.php');
                 <div class="col-md-6  title-ins-sublabel-right" style="width: 50%;float: left;">
                     <label class="title-ins-sublabel">
                         <?php 
-                        if(isset($reg->sentTimestamp) && !empty($reg->sentTimestamp)) {
-                            echo "Registrada no dia: " . $reg->sentTimestamp->format('d/m/Y');
-                        }else{
-                            echo "Inscrição em Rascunho";
-                        }
+                            echo !is_null($reg->sentTimestamp) ? "Registrada no dia: " . $reg->sentTimestamp->format('d/m/Y') : '';       
                         ?>
                     </label> <br>
                 </div>

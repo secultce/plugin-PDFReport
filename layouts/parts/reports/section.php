@@ -1,6 +1,5 @@
 <?php
 use PDFReport\Entities\Pdf;
-
 ?>
 
 <div class="border-section">
@@ -19,17 +18,17 @@ use PDFReport\Entities\Pdf;
     <span class="span-section">
         <?php
             if($fields['fieldType'] === 'section') {
-                echo "<br><br>";
+                echo "<hr><br>";
                 echo '<u>'.$fields['title'].'</u>';
             }else{
-                echo $fields['title'].' :';
+                echo $fields['title'].': ';
             }
             ?>
     </span>
     <span style="width: 20px; text-align: justify-all;"><?php 
-        $valueMeta = Pdf::getValueField($fields['id'], $reg->id); 
-        foreach ($valueMeta as $keyMeta => $valueMeta) {
-            
+        $valueMetas = Pdf::getValueField($fields['id'], $reg->id); 
+
+        foreach ($valueMetas as $keyMeta => $valueMeta) {
             if($fields['fieldType'] == 'checkbox') {  
                 if($valueMeta->value) {
                     echo $fields['description'];
@@ -37,29 +36,52 @@ use PDFReport\Entities\Pdf;
                     echo "Não informado";
                 }
             }else if($fields['fieldType'] == 'cnpj') {
-                $cnpj = Pdf::mask($valueMeta->value,'##.###.###/####-##');
-                echo $cnpj;
-
+                echo Pdf::mask($valueMeta->value,'##.###.###/####-##');
             }else if($fields['fieldType'] == 'persons') {
-
                 $persons = json_decode($valueMeta->value, true);
                 $namesPersons = [];
                 foreach($persons as $person) {
                     $namesPersons[] = $person['name'];
                 }
                 echo implode(", ", $namesPersons);
+            } else if ($fields['fieldType'] ==  'space-field') {
+                $endereco = json_decode($valueMeta->value, true);
 
-            }else{
+                $additional     = ( isset($endereco['En_Complemento'] ) && $endereco['En_Complemento'] != '' ) ? ", " . $endereco['En_Complemento']: "" ;
+                $neighborhood   = ( isset($endereco['En_Bairro'] ) && $endereco['En_Bairro'] != '' ) ? ", " . $endereco['En_Bairro']: "" ;
+                $city           = ( isset($endereco['En_Municipio'] ) && $endereco['En_Municipio'] != '' ) ? ", " . $endereco['En_Municipio']: "" ;
+                $state          = ( isset($endereco['En_Estado'] ) && $endereco['En_Estado'] != '' ) ? ", " . $endereco['En_Estado']: "" ;
+                $cep            = ( isset($endereco['En_CEP'] ) && $endereco['En_CEP'] != '' ) ? ", " . $endereco['En_CEP']: "" ;
+                $address_number = ( isset($endereco['En_Num'] ) && $endereco['En_Num'] != '' ) ? ", " . $endereco['En_Num']: "" ;
+                $street         = ( isset($endereco['En_Nome_Logradouro'] ) && $endereco['En_Nome_Logradouro'] != '' ) ? $endereco['En_Nome_Logradouro']: "" ;
+                //montando endereço caso o $endereco == null
+                $address = $street .  $address_number . $additional . $neighborhood . $cep . $city . $state;
 
+                echo $address;
+            } else if ($fields['fieldType'] ==  'agent-owner-field') {
+                if ($fields['config']['entityField'] == '@location') {
+                    $endereco = json_decode($valueMeta->value, true);
+
+                    $additional     = ( isset($endereco['En_Complemento'] ) && $endereco['En_Complemento'] != '' ) ? ", " . $endereco['En_Complemento']: "" ;
+                    $neighborhood   = ( isset($endereco['En_Bairro'] ) && $endereco['En_Bairro'] != '' ) ? ", " . $endereco['En_Bairro']: "" ;
+                    $city           = ( isset($endereco['En_Municipio'] ) && $endereco['En_Municipio'] != '' ) ? ", " . $endereco['En_Municipio']: "" ;
+                    $state          = ( isset($endereco['En_Estado'] ) && $endereco['En_Estado'] != '' ) ? ", " . $endereco['En_Estado']: "" ;
+                    $cep            = ( isset($endereco['En_CEP'] ) && $endereco['En_CEP'] != '' ) ? ", " . $endereco['En_CEP']: "" ;
+                    $address_number = ( isset($endereco['En_Num'] ) && $endereco['En_Num'] != '' ) ? ", " . $endereco['En_Num']: "" ;
+                    $street         = ( isset($endereco['En_Nome_Logradouro'] ) && $endereco['En_Nome_Logradouro'] != '' ) ? $endereco['En_Nome_Logradouro']: "" ;
+                    //montando endereço caso o $endereco == null
+                    $address = $street .  $address_number . $additional . $neighborhood . $cep . $city . $state;
+                    echo $address;
+                }
+            } else {
                 echo $valueMeta->value;
-
             }
 
             // if($fields['fieldType'] == 'space-field') {
             //     echo 'space-field';
             // }
         }
-                            
+               
         /**
          * RETORNO DE TODOS OS METADATAS DO AGENTE COM OS INDICES SENDO O VALOR QUE ESTÁ 
          * EM KEY NA TABELA E O RESULTADO SENDO O VALOR QUE ESTÁ EM VALUE NA TABELA
@@ -77,7 +99,7 @@ use PDFReport\Entities\Pdf;
 
         ?></span><br>
     <?php
-        endforeach;
+        endforeach;      
     ?>
 
 </div>
