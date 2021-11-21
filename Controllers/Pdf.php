@@ -37,26 +37,19 @@ class Pdf extends \MapasCulturais\Controller{
         $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
         'format' => 'A4',
         'orientation' => 'L']);
-
-        $footer = '<div style="border-top: 1px solid #c5c5c5;">
-        <p style="text-align: center; font-size: 10px;"><span>Escola de Saúde Pública do Ceará Paulo Marcelo Martins Rodrigues</span></p>
-        <p style="text-align: center; font-size: 10px;"><span>Av. Antônio Justa, 3161 - Meireles - CEP: 60.165-090</span></p>
-        <p style="text-align: center; font-size: 10px;"><span>Fortaleza / CE - Fone: (85) 3101.1398</span></p>
-        </div>';
-        
         ob_start();
 
         $app->view->jsObject['subscribers'] = $array['regs']['regs'];
         $app->view->jsObject['opp'] = $array['regs']['opp'];
+        $app->view->jsObject['claimDisabled'] = $array['claimDisabled'];
 
         $content = $app->view->fetch($array['template']);
         // $mpdf->SetHTMLFooter($footer, 'E');
         // $mpdf->writingHTMLfooter = true;
         // $mpdf->SetDisplayMode('fullpage');
         // $mpdf->SetTitle('Mapa da Saúde - Relatório');
-        // $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
-        
-        // $mpdf->WriteHTML($stylesheet,1);
+        $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
+        $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
         $mpdf->Output();
         exit;
@@ -65,7 +58,7 @@ class Pdf extends \MapasCulturais\Controller{
         // $app->view->jsObject['opp'] = $array['regs']['opp'];
         // $app->view->jsObject['subscribers'] = $array['regs']['regs'];
         // $app->view->jsObject['title'] = $array['title'];
-        // $app->view->jsObject['claimDisabled'] = $array['claimDisabled'];
+        // 
  
         // $app->render($array['template']); 
         // $content = $app->view->fetch($template);
