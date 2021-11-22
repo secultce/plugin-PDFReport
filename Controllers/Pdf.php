@@ -35,8 +35,7 @@ class Pdf extends \MapasCulturais\Controller{
         else $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
 
         $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
-        'format' => 'A4',
-        'orientation' => 'L']);
+        'format' => 'A4']);
         ob_start();
 
         $app->view->jsObject['subscribers'] = $array['regs']['regs'];
@@ -84,7 +83,7 @@ class Pdf extends \MapasCulturais\Controller{
 
     function listPreliminaryHandle($app, $array){
 
-        $array['regs'] = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
+        $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport']);
         if(empty($array['regs']['regs'])){
             $this->handleRedirect('Ops! A oportunidade deve estar publicada.', 401);
         }
@@ -94,7 +93,6 @@ class Pdf extends \MapasCulturais\Controller{
         if(isset($verifyResource[0])){
             $array['claimDisabled'] = $verifyResource[0]->value;
         }
-       
         $array['title'] = 'Resultado Preliminar do Certame';
         $array['template'] = 'pdf/preliminary';
         return $array;
@@ -236,6 +234,20 @@ class Pdf extends \MapasCulturais\Controller{
                 ]
             );
         }
+        
+        return ['opp' => $opp, 'regs' => $regs];
+    }
+
+    function oportunityAllRegistration($idopportunity) 
+    {
+        $app = App::i();
+        $opp = $app->repo('Opportunity')->find($idopportunity);
+
+        $regs = $app->repo('Registration')->findBy(
+            [
+            'opportunity' => $idopportunity
+            ]
+        );
         
         return ['opp' => $opp, 'regs' => $regs];
     }

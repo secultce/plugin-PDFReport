@@ -1,4 +1,6 @@
 <?php 
+    use Saude\Utils\RegistrationStatus;
+
     $this->layout = 'nolayout-pdf'; 
     $sub = $app->view->jsObject['subscribers'];
     $nameOpportunity = $sub[0]->opportunity->name;
@@ -12,12 +14,12 @@
         <div class="table-info-cat">
             <?php echo $nameCat; ?>
         </div>
-        <table width="100%">
+        <table id="table-preliminar" width="100%" >
             <thead>
                 <tr>
                     <th class="text-left" width="30%">Inscrição</th>
                     <th class="text-left" width="50%">Agentes candidatos</th>
-                    <th class="text-left" width="20%">??</th>
+                    <th class="text-left" width="20%">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,6 +30,7 @@
                         <tr>
                             <td><?php echo $nameSub->number; ?></td>
                             <td><?php echo $nameSub->owner->name; ?></td>
+                            <td><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td>
                         </tr>
                     <?php
                     }

@@ -231,3 +231,18 @@ body {
 .text-left{
    text-align: left;
 }
+
+#table-preliminar tr:nth-child(odd) td{
+   background-color:#ffffff;
+}
+#table-preliminar tr:nth-child(even) td{
+    background-color:#F5F5F5;
+}
+#table-preliminar {
+   border-spacing: 10px !important;
+   border-collapse: collapse;
+}
+#table-preliminar tr{
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
