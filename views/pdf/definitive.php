@@ -5,11 +5,16 @@
     $opp = $app->view->jsObject['opp'];
     $verifyResource = $this->verifyResource($this->postData['idopportunityReport']);
     $claimDisabled = $app->view->jsObject['claimDisabled'];
-   
+    include_once('header.php'); 
 ?>
-
-<div class="container">
-    <?php include_once('header.php'); ?>
+<main>
+    <div class="container">
+        <div class="pre-text">Resultado definitivo do certame</div>
+        <div class="opportunity-info">
+            <p>Oportunidade: </p>
+            <h4><?php echo $nameOpportunity ?></h4>
+        </div>
+    </div>
     <?php 
         //REDIRECIONA PARA OPORTUNIDADE CASO NÃO HAJA CATEGORIA        
         $type = $opp->evaluationMethodConfiguration->type->id;
@@ -26,10 +31,10 @@
                 $preliminary = false;
                 include_once('technical-category.php');
             }elseif($opp->registrationCategories !== "" &&  $type == 'simple' || $type == 'documentary'){
+                $preliminary = false;
                 include_once('simple-documentary-category.php');
             }
         }
 
     ?>
-
-</div>
+</main>

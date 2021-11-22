@@ -221,28 +221,31 @@ body {
 .table-info-cat {
    margin-top: 10px;
    margin-bottom: 10px;
-   background: #1F4E37;
-   border: 2px solid #1F4E37 !important;
-   border-radius: 25px !important;
+   background: #E8E8E8;
+   border: 2px solid #E8E8E8 !important;
    padding: 10px;
    left: 8px;
-   color: #FAFAFA !important;
+   color: black !important;
+   border-top-left-radius: 15px 15px;
+   border-top-right-radius: 15px 15px;
 }
 .text-left{
    text-align: left;
 }
 
 #table-preliminar tr:nth-child(odd) td{
-   background-color:#ffffff;
+   background-color:#F5F5F5;
 }
 #table-preliminar tr:nth-child(even) td{
-    background-color:#F5F5F5;
+   background-color:#ffffff;
 }
 #table-preliminar {
-   border-spacing: 10px !important;
    border-collapse: collapse;
 }
 #table-preliminar tr{
    margin-top: 10px;
    margin-bottom: 10px;
+}
+#table-preliminar  td,th {
+   padding: .3em 1em !important;
 }

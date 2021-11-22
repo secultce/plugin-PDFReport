@@ -134,7 +134,7 @@ class Pdf extends \MapasCulturais\Controller{
         }
 
         if($period) {
-            $array['regs'] = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
+            $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
             if(empty($array['regs']['regs'])){
                 $this->handleRedirect('Ops! Para gerar o relatório definitivo a oportunidade deve estar publicada.', 401);
             }
@@ -155,14 +155,14 @@ class Pdf extends \MapasCulturais\Controller{
             }
             
             if($countPublish == count($resource) && $countPublish > 0 && count($resource) > 0) {
-                $array['regs'] = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
+                $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
                 $array['title'] = 'Resultado Definitivo do Certame';
                 $array['template'] = 'pdf/definitive';
                
             }
             else if($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
                
-                $array['regs'] = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
+                $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
                 
                 if(empty($array['regs']['regs'])) {
                     $this->handleRedirect('Ops! Você deve publicar a oportunidade para esse relatório', 401);
