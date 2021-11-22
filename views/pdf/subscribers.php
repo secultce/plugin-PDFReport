@@ -15,18 +15,8 @@
 </style>
 <div class="container">
     <?php include_once('header.php'); 
-    if($op->avatar) :
     ?>
-    <table  style="height: 100px; margin-bottom:24px; margin-top:24px;">
-        <thead>
-            <tr>
-                <td>
-                    <img src="<?php echo $op->getFile('header')->url; ?>" alt="" srcset="">                
-                </td>
-            </tr>
-        </thead>
-    </table>
-    <?php endif; ?>    
+  
 
     <table width="100%" style="height: 100px; margin-bottom:40px; margin-top:40px;">
         <thead>
