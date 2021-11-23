@@ -255,11 +255,11 @@ class Pdf extends \MapasCulturais\Controller{
         'orientation' => 'L']);
         
         $reg = $app->repo('Registration')->find($this->data['id']);
-       
+
         //SE O DONO DA INSCRIÇÃO NAO FOR O MESMO LOGADO, ENTÃO NÃO TEM PERMISSÃO DE ACESSAR.
         if($reg->owner->userId != $app->user->id) {
-           //SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR
-            if(!$app->user->is('admin')){
+           //SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR           
+            if(!$reg->opportunity->owner->canUser('@control')){                
                 $_SESSION['error'] = "Ops! Você não tem permissão";               
                 $app->redirect($app->request()->getReferer(), 403);            
             }
@@ -271,16 +271,18 @@ class Pdf extends \MapasCulturais\Controller{
         $fields = [];
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
         foreach ($reg->opportunity->registrationFieldConfigurations as $field) {
-            
+         //   dump($fields);
             array_push($fields , [
+                        'displayOrder' => $field->displayOrder,
                         'id' => $field->id,
                         'title' => $field->title,
                         'description' => $field->description,
                         'fieldType' => $field->fieldType,
                         'config' => $field->config,
-                        'owner' => $field->owner
+                        'owner' => $field->owner                        
                     ]);
         }
+       // die;
         
         //ORDENANDO O ARRAY EM ORDEM DE ID
         sort($fields);
@@ -303,7 +305,7 @@ class Pdf extends \MapasCulturais\Controller{
         $mpdf->SetHTMLFooter($footer, 'E');
         $mpdf->writingHTMLfooter = true;
         //$mpdf->SetDisplayMode('fullpage');
-        $mpdf->SetTitle('');
+        $mpdf->SetTitle('Mapa da Saúde - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
         $mpdf->WriteHTML(ob_get_clean());
         $mpdf->WriteHTML($stylesheet,1);

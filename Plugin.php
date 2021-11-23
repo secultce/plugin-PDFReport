@@ -30,8 +30,14 @@ class Plugin extends \MapasCulturais\Plugin {
         });
 
         $app->hook('template(registration.<<*>>.form):end', function () use ($app) {
+            
             $id = $this->data['entity']->id;
-            $this->part('reports/button-print', ['id' => $id]);
+            $registration = $app->repo('Registration')->find($id);
+            
+            if($registration->status <> 0) {
+                $this->part('reports/button-print', ['id' => $id]);
+            }
+            
         });
        
     }

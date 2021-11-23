@@ -18,13 +18,10 @@ body {
 .sub-title-edital {
    margin-left: 20px;
    color: rgba(0, 0, 0, 0.87);
-   ;
    font-family: Arial;
    font-style: normal;
    font-weight: normal;
    font-size: 20px;
-   line-height: 10px;
-   /* display: flex; */
    align-items: center;
 }
 
@@ -251,4 +248,9 @@ body {
 }
 #table-preliminar  td,th {
    padding: .3em 1em !important;
+}
+.content-info-edital {
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
 }
