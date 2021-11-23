@@ -25,7 +25,9 @@ class Pdf extends \MapasCulturais\Controller{
             'regs' => '',
             'title' => '',
             'template' => '',
-            'claimDisabled' => null
+            'claimDisabled' => null,
+            'pluginConf' => ['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
+            'format' => 'A4']
         ];
         if($this->getData['selectRel'] == NO_SELECTION) $this->handleRedirect('Ops! Selecione uma opção', 401);
         else if($this->getData['selectRel'] == LIST_SUBSCRIBED) $array = $this->listSubscribedHandle($app, $array);
@@ -34,41 +36,22 @@ class Pdf extends \MapasCulturais\Controller{
         else if($this->getData['selectRel'] == LIST_CONTACTS) $array = $this->listContactsHandle($app, $array);
         else $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
 
-        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
-        'format' => 'A4', 'orientation' => 'L']);
+        $mpdf = new Mpdf($array['pluginConf']);
         ob_start();
-
+        
         $app->view->jsObject['subscribers'] = $array['regs']['regs'];
         $app->view->jsObject['opp'] = $array['regs']['opp'];
         $app->view->jsObject['claimDisabled'] = $array['claimDisabled'];
+        $app->view->jsObject['title'] = $array['title'];
 
         $content = $app->view->fetch($array['template']);
-        // $mpdf->SetHTMLFooter($footer, 'E');
-        // $mpdf->writingHTMLfooter = true;
-        // $mpdf->SetDisplayMode('fullpage');
-        // $mpdf->SetTitle('Mapa da Saúde - Relatório');
+        $mpdf->SetDisplayMode('fullpage');
+        $mpdf->SetTitle('Mapa da Saúde - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
         $mpdf->Output();
         exit;
-
-        // dump(getType($regs));
-        // $app->view->jsObject['opp'] = $array['regs']['opp'];
-        // $app->view->jsObject['subscribers'] = $array['regs']['regs'];
-        // $app->view->jsObject['title'] = $array['title'];
-        // 
- 
-        // $app->render($array['template']); 
-        // $content = $app->view->fetch($template);
-        
-        // $domPdf->loadHtml($content);
-        // $domPdf->setPaper('A4', 'portrait');
-        // $domPdf->render();
-        // // Output the generated PDF to Browser
-        // //$domPdf->stream();
-        // $domPdf->stream("relatorio.pdf", array("Attachment" => false));
-        // exit(0);
     }
     
     function listSubscribedHandle($app, $array){
@@ -95,6 +78,8 @@ class Pdf extends \MapasCulturais\Controller{
         }
         $array['title'] = 'Resultado Preliminar do Certame';
         $array['template'] = 'pdf/preliminary';
+        $array['pluginConf'] = ['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
+        'format' => 'A4', 'orientation' => 'L'];
         return $array;
     }
 
@@ -149,18 +134,14 @@ class Pdf extends \MapasCulturais\Controller{
             foreach ($resource as $key => $value) {
                 if($value->replyPublish == 1 && $value->opportunityId->publishedRegistrations == 1) {
                     $countPublish++;//SE ENTRAR INCREMENTA A VARIAVEL
-                }else{
-                    $countPublish = 0;
                 }
             }
-            
             if($countPublish == count($resource) && $countPublish > 0 && count($resource) > 0) {
                 $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
                 $array['title'] = 'Resultado Definitivo do Certame';
                 $array['template'] = 'pdf/definitive';
                
-            }
-            else if($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
+            }else if($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
                
                 $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
                 
@@ -183,7 +164,10 @@ class Pdf extends \MapasCulturais\Controller{
                 }else{
                     $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos'), 401);
                 }
-            
+            }else{
+                $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
+                $array['title'] = 'Resultado Definitivo do Certame';
+                $array['template'] = 'pdf/definitive';
             }
         }else{
             $this->handleRedirect('Ops! Ocorreu um erro inesperado.', 401);

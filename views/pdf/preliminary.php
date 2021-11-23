@@ -15,20 +15,13 @@
             <h4><?php echo $nameOpportunity ?></h4>
         </div>
     </div>
-    <?php 
-        //REDIRECIONA PARA OPORTUNIDADE CASO NÃO HAJA CATEGORIA        
+    <?php    
         $type = $opportunity->evaluationMethodConfiguration->type->id;
-        // dump($type);
-        // dump($opportunity->registrationCategorie);
-        // die;
-        //QUANDO NÃO TIVER RECURSO OU ESTIVER DESABILITADO
         if($opportunity->registrationCategories == "" &&  $type == 'technical'){
             include_once('technical-no-category.php');
         }elseif($opportunity->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary'){
             include_once('simple-documentary-no-category.php');
-        }
-
-        if($opportunity->registrationCategories !== "" &&  $type == 'technical'){
+        }elseif($opportunity->registrationCategories !== "" &&  $type == 'technical'){
             $preliminary = true;
             include_once('technical-category.php');
         }elseif($opportunity->registrationCategories !== "" &&  $type == 'simple'|| $type == 'documentary'){

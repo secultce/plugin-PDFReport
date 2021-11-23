@@ -1,12 +1,8 @@
 <?php 
-    $this->layout = 'nolayout'; 
+    $this->layout = 'nolayout-pdf'; 
     $sub = $app->view->jsObject['subscribers'];
     $nameOpportunity = $sub[0]->opportunity->name;
-    //Objeto Oportunidade
     $op = $app->view->jsObject['opp'];
-    include_once('style.php');  
-    // dump($sub);
-    // die;
 ?>
 </style>
 <div class="container">

@@ -1,5 +1,6 @@
 <?php 
     use MapasCulturais\App;
+    use Saude\Utils\RegistrationStatus;
 
     $this->layout = 'nolayout-pdf'; 
     $sub = $app->view->jsObject['subscribers'];
@@ -8,7 +9,13 @@
     $sections = $opp->evaluationMethodConfiguration->sections;
     $criterios = $opp->evaluationMethodConfiguration->criteria;
 
-    function getSectionNote($opp, $registration, $section_id, $qtdWeightTotal){
+    function invenDescSort($item1,$item2){
+        if ($item1->consolidatedResult == $item2->consolidatedResult) return 0;
+        return ($item1->consolidatedResult < $item2->consolidatedResult) ? 1 : -1;
+    }
+    usort($sub,'invenDescSort');
+
+    function getSectionNote($opp, $registration, $section_id, $qtdWeightTotal = null){
         $total = 0.00;
         $app = App::i();
         $committee = $opp->getEvaluationCommittee();
@@ -17,7 +24,6 @@
             $users[] = $item->agent->user->id;
         }
         $evaluations = $app->repo('RegistrationEvaluation')->findByRegistrationAndUsersAndStatus($registration, $users);
-        $result = 0;
         foreach ($evaluations as $eval){
             $cfg = $eval->getEvaluationMethodConfiguration();
             $category = $eval->registration->category;
@@ -35,7 +41,9 @@
             }
             $total += floatval($totalSection);
         }
-        $total = $total / $qtdWeightTotal;
+        if($qtdWeightTotal){
+            $total = $total / $qtdWeightTotal;
+        }
         return $total;
     }
 ?>
@@ -45,19 +53,22 @@
         <div class="table-info-cat">
             <?php echo $nameCat; ?>
         </div>
-        <table width="100%">
+        <table id="table-preliminar" width="100%">
             <thead>
                 <tr>
+                    <?php if(isset($preliminary) && $preliminary == false) echo '<th class="text-center" width="10%">Classificação</th>'; ?>
                     <th class="text-center" width="10%">Inscrição</th>
                     <th class="text-center" width="20%">Agentes candidatos</th>
                     <?php 
-                        foreach ($sections as $section) {
-                            if(in_array($nameCat, $section->categories)){?>
-                                <th class="text-center" width="<?php echo (60 / count($sections)) ?>%"><?php echo $section->name; ?></th>
-                    <?php   } 
-                    }
+                        if(!isset($preliminary)){
+                            foreach ($sections as $section) {
+                                if(in_array($nameCat, $section->categories)){?>
+                                    <th class="text-center" width="<?php echo (60 / count($sections)) ?>%"><?php echo $section->name; ?></th>
+                    <?php       }   
+                            } 
+                        }
                     ?>
-                    <th class="text-center" width="10%">Resultado Preliminar</th>
+                    <th class="text-center" width="10%"><?php echo !isset($preliminary) ? "Resultado Preliminar" : "NF" ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -66,16 +77,19 @@
                     if($nameCat == $nameSub->category){
                         ?>
                         <tr>
+                            <?php if(isset($preliminary) && $preliminary == false){?>  <td><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td> <?php } ?>
                             <td class="text-center"><?php echo $nameSub->number; ?></td>
                             <td class="text-center"><?php echo $nameSub->owner->name; ?></td>
                             <?php 
-                                foreach ($sections as $section) {
-                                    if(in_array($nameCat, $section->categories)){?>
-                                        <td class="text-center"><?php echo getSectionNote($opp, $nameSub, $section->id, $section->weight); ?></td>
-                            <?php   }
+                                if(!isset($preliminary)){
+                                    foreach ($sections as $section) {
+                                        if(in_array($nameCat, $section->categories)){?>
+                                            <td class="text-center"><?php echo getSectionNote($opp, $nameSub, $section->id, $section->weight); ?></td>
+                            <?php       } 
+                                    }
                                 }
                             ?>
-                            <td class="text-center"><?php echo $nameSub->preliminaryResult; ?></td>
+                            <td class="text-center"><?php echo !isset($preliminary) ? $nameSub->preliminaryResult : $nameSub->consolidatedResult; ?></td>
                         </tr>
                     <?php
                     }

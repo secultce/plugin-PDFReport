@@ -25,9 +25,7 @@
                 include_once('technical-no-category.php');
             }elseif($opp->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary'){
                 include_once('simple-documentary-no-category.php');
-            }
-            // tem categoria, tecnica e nao tem recurso
-            if($opp->registrationCategories !== "" &&  $type == 'technical' ){
+            }elseif($opp->registrationCategories !== "" &&  $type == 'technical' ){
                 $preliminary = false;
                 include_once('technical-category.php');
             }elseif($opp->registrationCategories !== "" &&  $type == 'simple' || $type == 'documentary'){
