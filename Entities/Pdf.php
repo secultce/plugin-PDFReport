@@ -36,6 +36,33 @@ class Pdf extends \MapasCulturais\Entity{
         return $maskared;
     }
 
+    /**
+     * Metodo que converte uma string de json em array
+     *
+     * @param [type] $value o valor que vem do campo $valueMetas
+     * @param [type] $field string do nome do campo do indice array
+     * @param [type] $nameField string do nome do campo do valor do array
+     * @return void showDecode($valueMeta->value, 'title')
+     */
+    static public function showDecode($value, $field = null, $nameField) {
+        $stringDecodeJson = json_decode($value, true);
+        $arrayItens = [];
+        foreach($stringDecodeJson as $item) {
+            //$listLinks[] = $link['value'];
+            if(!is_null($field)) {
+                if(isset($item[$field])){
+                    $arrayItens[] = "Titulo: ".$item[$field]." : ".$item[$nameField];
+                }else{
+                    $arrayItens[] = $item[$nameField];
+                }
+            }else{
+                $arrayItens[] = $item[$nameField];
+            }
+            
+        }
+        echo implode(", ", $arrayItens);
+    }
+
     //static public function getAgente
 }
 

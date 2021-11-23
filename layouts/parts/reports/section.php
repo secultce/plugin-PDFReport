@@ -12,7 +12,6 @@ use PDFReport\Entities\Pdf;
     <?php 
         $check = 'Não confirmado';
         foreach ($field as $fields) :
-            
     ?>
 
     <span class="span-section">
@@ -27,7 +26,7 @@ use PDFReport\Entities\Pdf;
     </span>
     <span style="width: 20px; text-align: justify-all;"><?php 
         $valueMetas = Pdf::getValueField($fields['id'], $reg->id); 
-
+            dump($fields);
         foreach ($valueMetas as $keyMeta => $valueMeta) {
             if($fields['fieldType'] == 'checkbox') {  
                 if($valueMeta->value) {
@@ -37,13 +36,12 @@ use PDFReport\Entities\Pdf;
                 }
             }else if($fields['fieldType'] == 'cnpj') {
                 echo Pdf::mask($valueMeta->value,'##.###.###/####-##');
+            }else if($fields['fieldType'] == 'cpf') {
+                echo Pdf::mask($valueMeta->value,'###.###.###-##');
             }else if($fields['fieldType'] == 'persons') {
-                $persons = json_decode($valueMeta->value, true);
-                $namesPersons = [];
-                foreach($persons as $person) {
-                    $namesPersons[] = $person['name'];
-                }
-                echo implode(", ", $namesPersons);
+
+                Pdf::showDecode($valueMeta->value, null, 'name');
+
             } else if ($fields['fieldType'] ==  'space-field') {
                 $endereco = json_decode($valueMeta->value, true);
 
@@ -73,7 +71,11 @@ use PDFReport\Entities\Pdf;
                     $address = $street .  $address_number . $additional . $neighborhood . $cep . $city . $state;
                     echo $address;
                 }
-            } else {
+            }else if($fields['fieldType'] == 'date') {
+                echo date("d/m/Y", strtotime($valueMeta->value));
+            }else if($fields['fieldType'] == 'links') {
+                Pdf::showDecode($valueMeta->value, 'title', 'value');
+            }else {
                 echo $valueMeta->value;
             }
 
@@ -100,6 +102,7 @@ use PDFReport\Entities\Pdf;
         ?></span><br>
     <?php
         endforeach;      
+        die;
     ?>
 
 </div>
