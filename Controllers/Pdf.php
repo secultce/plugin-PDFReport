@@ -35,7 +35,7 @@ class Pdf extends \MapasCulturais\Controller{
         else $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
 
         $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
-        'format' => 'A4']);
+        'format' => 'A4', 'orientation' => 'L']);
         ob_start();
 
         $app->view->jsObject['subscribers'] = $array['regs']['regs'];

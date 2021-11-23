@@ -232,6 +232,9 @@ body {
 .text-left{
    text-align: left;
 }
+.text-center{
+   text-align: center;
+}
 
 #table-preliminar tr:nth-child(odd) td{
    background-color:#F5F5F5;
