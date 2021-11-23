@@ -248,11 +248,11 @@ class Pdf extends \MapasCulturais\Controller{
         'orientation' => 'L']);
         
         $reg = $app->repo('Registration')->find($this->data['id']);
-       
+
         //SE O DONO DA INSCRIÇÃO NAO FOR O MESMO LOGADO, ENTÃO NÃO TEM PERMISSÃO DE ACESSAR.
         if($reg->owner->userId != $app->user->id) {
-           //SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR
-            if(!$app->user->is('admin')){
+           //SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR           
+            if(!$reg->opportunity->owner->canUser('@control')){                
                 $_SESSION['error'] = "Ops! Você não tem permissão";               
                 $app->redirect($app->request()->getReferer(), 403);            
             }
