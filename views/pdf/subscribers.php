@@ -15,32 +15,7 @@
 </style>
 <div class="container">
     <?php include_once('header.php'); 
-    ?>
-  
-
-    <table width="100%" style="height: 100px; margin-bottom:40px; margin-top:40px;">
-        <thead>
-            <tr class="">
-                <td style="width: 10%;">                   
-                    <?php if(!empty($op->files['avatar'])): ?>
-                        <img src="<?php echo $op->avatar->transform('avatarSmall')->url; ?>"  style="width: 80px; height: 80px;">
-                    <?php else: ?>
-                        <img src="<?php $this->asset('img/pdfreport/avatar--opportunity.png') ?>" style="width: 80px; height: 80px;">
-                    <?php endif; ?>
-                </td>
-                <td style="width: 90%;">
-                
-                    <label class="title-edital">Edital</label><br>
-                    <label class="sub-title-edital"><?php echo $op->ownerEntity->name; ?></label>
-                    <br>
-                    <label for="" class="title-edital">Oportunidade</label><br>
-                    <label class="sub-title-edital"><?php echo $op->name; ?></label>
-                </td>
-            </tr>
-        </thead>
-    </table>
-
-
+?>
     <div class="row">
         <div class="container">
         <br>
