@@ -10,14 +10,10 @@
     <link type="text/css" href="<?php $this->asset('css/bootstrap.min.css') ?>" rel="stylesheet" />
     <link type="text/css" href="<?php $this->asset('css/stylePdfReport.css') ?>" rel="stylesheet" />
     <script src="<?php $this->asset('js/pdfreport/jquery.min.js') ?>"></script>
-    <style>
-            @page {  margin: 24px 24px;  }
-            footer { position: fixed; bottom: -15px; left: 0px; right: 0px;height: 50px; border-top: 1px solid #c3c3c3;
-             color: rgba(0, 0, 0, 0.6);}
-            
-    </style>
+
 </head>
 <body>
+<?php if(isset($_GET['idopportunityReport']) && $_GET['idopportunityReport'] > 0) : ?>
 <div class="container">
     <br>
     <a href="#" class="btn btn-primary" id="btn-print-report" >
@@ -25,6 +21,7 @@
         Imprimir Relatório
     </a>
 </div>
+<?php endif; ?>
 <table width="100%" style="height: 100px;">
     <thead>
         <tr class="">
