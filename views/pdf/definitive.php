@@ -22,8 +22,10 @@
         if(empty($claimDisabled) || $claimDisabled == 1) {
             // nao tem categoria, tecnica e nao tem recurso 
             if($opp->registrationCategories == "" &&  $type == 'technical'){
+                $preliminary = false;
                 include_once('technical-no-category.php');
             }elseif($opp->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary'){
+                $preliminary = false;
                 include_once('simple-documentary-no-category.php');
             }elseif($opp->registrationCategories !== "" &&  $type == 'technical' ){
                 $preliminary = false;

@@ -15,7 +15,7 @@
     }
     usort($sub,'invenDescSort');
 
-    function getSectionNote($opp, $registration, $section_id, $qtdWeightTotal = null){
+    function getSectionNote($opp, $registration, $section_id){
         $total = 0.00;
         $app = App::i();
         $committee = $opp->getEvaluationCommittee();
@@ -40,9 +40,6 @@
                 }
             }
             $total += floatval($totalSection);
-        }
-        if($qtdWeightTotal){
-            $total = $total / $qtdWeightTotal;
         }
         return $total;
     }
@@ -84,7 +81,7 @@
                                 if(!isset($preliminary)){
                                     foreach ($sections as $section) {
                                         if(in_array($nameCat, $section->categories)){?>
-                                            <td class="text-center"><?php echo getSectionNote($opp, $nameSub, $section->id, $section->weight); ?></td>
+                                            <td class="text-center"><?php echo getSectionNote($opp, $nameSub, $section->id); ?></td>
                             <?php       } 
                                     }
                                 }
