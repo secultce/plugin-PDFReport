@@ -17,15 +17,6 @@
 
 </head>
 <body>
-<?php if(isset($_GET['idopportunityReport']) && $_GET['idopportunityReport'] > 0) : ?>
-<div class="container">
-    <br>
-    <a href="#" class="btn btn-primary" id="btn-print-report" >
-        <i class="fa fa-print"></i>
-        Imprimir Relatório
-    </a>
-</div>
-<?php endif; ?>
 <table width="100%" style="height: 100px;">
     <thead>
         <tr class="">
