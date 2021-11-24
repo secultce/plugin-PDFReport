@@ -20,8 +20,6 @@ class Pdf extends \MapasCulturais\Controller{
 
     function GET_gerarPdf() {
         $app = App::i();
-        $this->handleRedirect('Ops! Não tem inscrito nessa oportunidade.', 401);
-        die;
 
         $array = [
             'regs' => '',
