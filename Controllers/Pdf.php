@@ -3,12 +3,13 @@ namespace PDFReport\Controllers;
 
 require PLUGINS_PATH.'PDFReport/vendor/autoload.php';
 require PLUGINS_PATH.'PDFReport/vendor/dompdf/dompdf/src/FontMetrics.php';
+
 use DateTime;
-use \MapasCulturais\App;
+use Mpdf\Mpdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use \MapasCulturais\App;
 use PDFReport\Entities\Pdf as EntitiesPdf;
-use Mpdf\Mpdf;
 
 const NO_SELECTION = 0;
 const LIST_SUBSCRIBED = 1;
@@ -29,11 +30,11 @@ class Pdf extends \MapasCulturais\Controller{
             'pluginConf' => ['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
             'format' => 'A4']
         ];
-        if($this->getData['selectRel'] == NO_SELECTION) $this->handleRedirect('Ops! Selecione uma opção', 401);
-        else if($this->getData['selectRel'] == LIST_SUBSCRIBED) $array = $this->listSubscribedHandle($app, $array);
-        else if($this->getData['selectRel'] == LIST_PRELIMINARY) $array = $this->listPreliminaryHandle($app, $array);
-        else if($this->getData['selectRel'] == LIST_DEFINITIVE) $array = $this->listDefinitiveHandle($app, $array);
-        else if($this->getData['selectRel'] == LIST_CONTACTS) $array = $this->listContactsHandle($app, $array);
+        if($this->getData['selectRel'] == NO_SELECTION) EntitiesPdf::handleRedirect('Ops! Selecione uma opção', 401, $this->getData['idopportunityReport']);
+        else if($this->getData['selectRel'] == LIST_SUBSCRIBED) $array = EntitiesPdf::listSubscribedHandle($app, $array, $this->getData);
+        else if($this->getData['selectRel'] == LIST_PRELIMINARY) $array = EntitiesPdf::listPreliminaryHandle($app, $array, $this->getData);
+        else if($this->getData['selectRel'] == LIST_DEFINITIVE) $array = EntitiesPdf::listDefinitiveHandle($app, $array, false, $this->getData);
+        else if($this->getData['selectRel'] == LIST_CONTACTS) $array = EntitiesPdf::listContactsHandle($app, $array, $this->getData);
         else $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
 
         $mpdf = new Mpdf($array['pluginConf']);
@@ -54,195 +55,6 @@ class Pdf extends \MapasCulturais\Controller{
         exit;
     }
     
-    function listSubscribedHandle($app, $array){
-        $array['regs'] = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 'ALL');
-        if(empty($array['regs']['regs'])){
-            $this->handleRedirect('Ops! Não tem inscrito nessa oportunidade.', 401);
-        }
-        $array['title'] = 'Relatório de inscritos na oportunidade';
-        $array['template'] = 'pdf/subscribers';
-        return $array;
-    }
-
-    function listPreliminaryHandle($app, $array){
-
-        $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport']);
-        if(empty($array['regs']['regs'])){
-            $this->handleRedirect('Ops! A oportunidade deve estar publicada.', 401);
-        }
-
-        $verifyResource = $this->verifyResource($this->getData['idopportunityReport']);
-
-        if(isset($verifyResource[0])){
-            $array['claimDisabled'] = $verifyResource[0]->value;
-        }
-        $array['title'] = 'Resultado Preliminar do Certame';
-        $array['template'] = 'pdf/preliminary';
-        $array['pluginConf'] = ['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
-        'format' => 'A4', 'orientation' => 'L'];
-        return $array;
-    }
-
-    function listDefinitiveHandle($app, $array, $period = false){
-        $id = $this->getData['idopportunityReport'];
-
-        $dqlOpMeta = "SELECT op FROM 
-            MapasCulturais\Entities\OpportunityMeta op
-            WHERE op.owner = {$id}";
-
-        $resultOpMeta = $app->em->createQuery($dqlOpMeta)->getResult();
-
-        $dateInit = $dateEnd = $hourInit = $hourEnd = "";
-
-        foreach ($resultOpMeta as $key => $valueOpMeta) {
-            if($valueOpMeta->key == 'date-initial'){
-                $dateInit = $valueOpMeta->value;
-            }
-            if($valueOpMeta->key == 'hour-initial'){
-                $hourInit = $valueOpMeta->value;
-            }
-            if($valueOpMeta->key == 'date-final'){
-                $dateEnd = $valueOpMeta->value;
-            }
-            if($valueOpMeta->key == 'hour-final'){
-                $hourEnd = $valueOpMeta->value;
-            }
-        }
-        $dateHourNow = new DateTime;
-        
-        $dateAndHourInit = $dateInit.' '.$hourInit;
-
-        $dateVerifyPeriod = DateTime::createFromFormat('d/m/Y H:i:s', $dateAndHourInit);
-
-        if($dateHourNow > $dateVerifyPeriod){
-            $period = true;
-        }
-
-        if($period) {
-            $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
-            if(empty($array['regs']['regs'])){
-                $this->handleRedirect('Ops! Para gerar o relatório definitivo a oportunidade deve estar publicada.', 401);
-            }
-            
-            //SELECT AOS RECURSOS
-            $dql = "SELECT r
-            FROM 
-            Saude\Entities\Resources r
-            WHERE r.opportunityId = {$id}";
-            $resource = $app->em->createQuery($dql)->getResult();
-            $countPublish = 0;//INICIANDO VARIAVEL COM 0
-            foreach ($resource as $key => $value) {
-                if($value->replyPublish == 1 && $value->opportunityId->publishedRegistrations == 1) {
-                    $countPublish++;//SE ENTRAR INCREMENTA A VARIAVEL
-                }
-            }
-            if($countPublish == count($resource) && $countPublish > 0 && count($resource) > 0) {
-                $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
-                $array['title'] = 'Resultado Definitivo do Certame';
-                $array['template'] = 'pdf/definitive';
-               
-            }else if($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
-               
-                $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
-                
-                if(empty($array['regs']['regs'])) {
-                    $this->handleRedirect('Ops! Você deve publicar a oportunidade para esse relatório', 401);
-                }
-
-                $verifyResource = $this->verifyResource($this->getData['idopportunityReport']);
-                
-                if(isset($verifyResource[0])){
-                    $array['claimDisabled'] = $verifyResource[0]->value;
-                }
-                
-                if(isset($regs['regs'][0]) && empty($verifyResource) || $array['claimDisabled'] == 1 ){
-                    $array['title'] = 'Resultado Definitivo do Certame';
-                    $array['template'] = 'pdf/definitive';
-                }else if(isset($regs['regs'][0]) && empty($verifyResource) || $array['claimDisabled'] == 0){
-                    $array['title'] = 'Resultado Definitivo do Certame';
-                    $array['template'] = 'pdf/definitive';
-                }else{
-                    $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos'), 401);
-                }
-            }else{
-                $array['regs'] = $this->oportunityAllRegistration($this->getData['idopportunityReport'], 10);
-                $array['title'] = 'Resultado Definitivo do Certame';
-                $array['template'] = 'pdf/definitive';
-            }
-        }else{
-            $this->handleRedirect('Ops! Ocorreu um erro inesperado.', 401);
-        }
-        return $array;
-    }
-
-    function listContactsHandle($app, $array){
-        $array['regs'] = $this->oportunityRegistrationAproved($this->getData['idopportunityReport'], 10);
-
-        if(empty($regs['regs']['regs'])){
-            $this->handleRedirect('', 401);
-        }
-        $array['title'] = 'Relatório de contato';
-        $array['template'] = 'pdf/contact';
-        return $array;
-    }
-
-    function handleRedirect($error_message, $status_code){
-        $app = App::i();
-        $_SESSION['error'] = $error_message;
-        $url = $app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos');
-        $app->redirect(substr_replace($url ,"", -1), $status_code);
-    }
-    
-    /**
-     * Busca a oportunidade e todos os aprovados da inscrição 
-     *
-     * @param [integer] $idopportunity
-     * @return void array
-     */
-    function oportunityRegistrationAproved($idopportunity, $status) 
-    {
-        $app = App::i();
-        $opp = $app->repo('Opportunity')->find($idopportunity);
-        
-        if($status == 10) {
-            $dql = "SELECT r
-                    FROM 
-                    MapasCulturais\Entities\Registration r
-                    WHERE r.opportunity = {$idopportunity}
-                    AND r.status = 10 ORDER BY r.consolidatedResult DESC";
-            $query = $app->em->createQuery($dql);
-            $regs = $query->getResult();
-        }else{
-            $regs = $app->repo('Registration')->findBy(
-                [
-                'opportunity' => $idopportunity
-                ]
-            );
-        }
-        
-        return ['opp' => $opp, 'regs' => $regs];
-    }
-
-    function oportunityAllRegistration($idopportunity) 
-    {
-        $app = App::i();
-        $opp = $app->repo('Opportunity')->find($idopportunity);
-
-        $regs = $app->repo('Registration')->findBy(
-            [
-            'opportunity' => $idopportunity
-            ]
-        );
-        
-        return ['opp' => $opp, 'regs' => $regs];
-    }
-
-    function verifyResource($idOportunidade) {
-        $app = App::i();
-        $opp = $app->repo('OpportunityMeta')->findBy(['owner'=>$idOportunidade,'key'=>'claimDisabled']);
-        return $opp;
-    }
-
     function GET_minha_inscricao() {
         ini_set('display_errors', 1);
         $app = App::i();

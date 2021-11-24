@@ -4,7 +4,7 @@
     $nameOpportunity = $sub[0]->opportunity->name;
     $opportunity = $app->view->jsObject['opp'];
     $claimDisabled = $app->view->jsObject['claimDisabled'];
-    include_once('header.php'); 
+    include_once('header-pdf.php'); 
 ?>
 
 <main>
