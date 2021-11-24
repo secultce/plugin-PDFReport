@@ -20,6 +20,8 @@ class Pdf extends \MapasCulturais\Controller{
 
     function GET_gerarPdf() {
         $app = App::i();
+        $this->handleRedirect('Ops! Não tem inscrito nessa oportunidade.', 401);
+        die;
 
         $array = [
             'regs' => '',
@@ -189,7 +191,8 @@ class Pdf extends \MapasCulturais\Controller{
     function handleRedirect($error_message, $status_code){
         $app = App::i();
         $_SESSION['error'] = $error_message;
-        $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos'), $status_code);
+        $url = $app->createUrl('oportunidade/'.$this->getData['idopportunityReport'].'#/tab=inscritos');
+        $app->redirect(substr_replace($url ,"", -1), $status_code);
     }
     
     /**
