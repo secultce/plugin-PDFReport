@@ -262,7 +262,7 @@ class Pdf extends \MapasCulturais\Controller{
         $fields = [];
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
         foreach ($reg->opportunity->registrationFieldConfigurations as $field) {
-         //   dump($fields);
+       
             array_push($fields , [
                         'displayOrder' => $field->displayOrder,
                         'id' => $field->id,
@@ -273,7 +273,7 @@ class Pdf extends \MapasCulturais\Controller{
                         'owner' => $field->owner                        
                     ]);
         }
-       // die;
+       //die;
         
         //ORDENANDO O ARRAY EM ORDEM DE ID
         sort($fields);
