@@ -41,7 +41,7 @@
             }
             $total += floatval($totalSection);
         }
-        return $total;
+        return $total / count($users);
     }
 ?>
 <div class="container">
@@ -53,19 +53,10 @@
         <table id="table-preliminar" width="100%">
             <thead>
                 <tr>
-                    <?php if(isset($preliminary) && $preliminary == false) echo '<th class="text-center" width="10%">Classificação</th>'; ?>
-                    <th class="text-center" width="10%">Inscrição</th>
-                    <th class="text-center" width="20%">Agentes candidatos</th>
-                    <?php 
-                        if(!isset($preliminary)){
-                            foreach ($sections as $section) {
-                                if(in_array($nameCat, $section->categories)){?>
-                                    <th class="text-center" width="<?php echo (60 / count($sections)) ?>%"><?php echo $section->name; ?></th>
-                    <?php       }   
-                            } 
-                        }
-                    ?>
-                    <th class="text-center" width="10%"><?php echo !isset($preliminary) ? "Resultado Preliminar" : "NF" ?></th>
+                    <th class="text-center" width="25%">Classificação</th>
+                    <th class="text-left" width="25%">Inscrição</th>
+                    <th class="text-left" width="40%">Agentes candidatos</th>
+                    <th class="text-center" width="10%"><?php echo !isset($preliminary) ? "RP" : "NF" ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -74,18 +65,9 @@
                     if($nameCat == $nameSub->category){
                         ?>
                         <tr>
-                            <?php if(isset($preliminary) && $preliminary == false){?>  <td><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td> <?php } ?>
-                            <td class="text-center"><?php echo $nameSub->number; ?></td>
-                            <td class="text-center"><?php echo $nameSub->owner->name; ?></td>
-                            <?php 
-                                if(!isset($preliminary)){
-                                    foreach ($sections as $section) {
-                                        if(in_array($nameCat, $section->categories)){?>
-                                            <td class="text-center"><?php echo getSectionNote($opp, $nameSub, $section->id); ?></td>
-                            <?php       } 
-                                    }
-                                }
-                            ?>
+                            <td class="text-center"><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td>
+                            <td class="text-left"><?php echo $nameSub->number; ?></td>
+                            <td class="text-left"><?php echo $nameSub->owner->name; ?></td>
                             <td class="text-center"><?php echo !isset($preliminary) ? $nameSub->preliminaryResult : $nameSub->consolidatedResult; ?></td>
                         </tr>
                     <?php

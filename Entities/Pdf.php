@@ -112,8 +112,6 @@ class Pdf extends \MapasCulturais\Entity{
         }
         $array['title'] = 'Resultado Preliminar do Certame';
         $array['template'] = 'pdf/preliminary';
-        $array['pluginConf'] = ['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
-        'format' => 'A4', 'orientation' => 'L'];
         return $array;
     }
 
