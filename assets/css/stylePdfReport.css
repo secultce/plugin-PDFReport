@@ -241,6 +241,7 @@ body {
 }
 #table-preliminar {
    border-collapse: collapse;
+   line-height: 30px;
 }
 #table-preliminar tr{
    margin-top: 10px;

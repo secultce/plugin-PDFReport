@@ -14,35 +14,6 @@
         return ($item1->consolidatedResult < $item2->consolidatedResult) ? 1 : -1;
     }
     usort($sub,'invenDescSort');
-
-    function getSectionNote($opp, $registration, $section_id){
-        $total = 0.00;
-        $app = App::i();
-        $committee = $opp->getEvaluationCommittee();
-        $users = [];
-        foreach ($committee as $item) {
-            $users[] = $item->agent->user->id;
-        }
-        $evaluations = $app->repo('RegistrationEvaluation')->findByRegistrationAndUsersAndStatus($registration, $users);
-        foreach ($evaluations as $eval){
-            $cfg = $eval->getEvaluationMethodConfiguration();
-            $category = $eval->registration->category;
-            $totalSection = 0.00;
-            foreach ($cfg->criteria as $cri) {
-                if ($section_id == $cri->sid) {
-                    $key = $cri->id;
-                    if(!isset($eval->evaluationData->$key)){
-                        return null;
-                    } else {
-                        $val = floatval($eval->evaluationData->$key);
-                        $totalSection += is_numeric($val) ? floatval($cri->weight) * floatval($val) : 0;
-                    }
-                }
-            }
-            $total += floatval($totalSection);
-        }
-        return $total / count($users);
-    }
 ?>
 <div class="container">
     <?php 
