@@ -111,10 +111,10 @@ include_once('header-pdf.php');
         <span class="my-registration-fields"> Categoria:  </span>
             <span class="my-registration-fields-span"> <?php echo ($reg->category !== "") ? $reg->category : 'Não informado'; ?></span><br>
         <span class="my-registration-fields"> Site:  </span>
-            <span ><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: "Não informado"; ?>
+            <span class="my-registration-fields-span" ><?php echo !empty($reg->owner->metadata['site']) ? $reg->owner->metadata['site']: "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Nome completo: </span>
-            <span ><?php echo $reg->owner->name ? $reg->owner->name : "Não informado"; ?>
+            <span class="my-registration-fields-span"><?php echo $reg->owner->name ? $reg->owner->name : "Não informado"; ?>
             </span><br>
         <span class="my-registration-fields">Data de Nascimento/Fundação: </span>
             <span  class="my-registration-fields-span">

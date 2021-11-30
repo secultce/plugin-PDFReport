@@ -40,7 +40,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
             }
             ?>
     </span>
-    <span style="width: 20px; text-align: justify-all;"><?php 
+    <span style="width: 20px; text-align: justify-all; font-size: 10px"><?php 
         $valueMetas = Pdf::getValueField($fields['id'], $reg->id); 
 
         foreach ($valueMetas as $keyMeta => $valueMeta) {
@@ -129,6 +129,29 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
         ?></span><br>
     <?php
         endforeach;
+        $fileRegistration = [];
+        if($reg->opportunity->registrationFileConfigurations->count() > 0) {
+            echo '<span class="span-section">Arquivos</span><br>';
+            foreach ($reg->opportunity->registrationFileConfigurations as $key => $file) {
+               $file = Pdf::getFileRegistration($reg, $file->fileGroupName);
+                array_push($fileRegistration, $file);
+            }
+        }
+        asort($fileRegistration);
+        foreach ($fileRegistration as  $fileReg) {
+           
+            if(is_array($fileReg)) {
+               
+                foreach ($fileReg as $valueFile) {
+                   
+                    $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
+            
+                    $url = $app->createUrl($controllerId, 'privateFile', [$valueFile->id]);
+                    //dump($valueFile->name.' - '.$url);
+                    echo '<a href="'.$url.'">'.$valueFile->name.'</a><br>';
+                }
+            }
+        }
         //die;
     ?>
 

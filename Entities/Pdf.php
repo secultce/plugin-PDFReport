@@ -172,6 +172,7 @@ class Pdf extends \MapasCulturais\Entity{
             echo trim(preg_replace('/\PL/u', ' ', $metaData));
         }
     }
+
     static public function getDependenciesField($registration, $field, $valueDependence) {
         //$field é o ID DO FIELD
         $app = App::i();
@@ -191,6 +192,20 @@ class Pdf extends \MapasCulturais\Entity{
         }
        // dump($show);
         return $show;
+    }
+
+    static public function getFileRegistration($registration, $fileGroup) {
+        $app = App::i();
+        //dump($fileGroup);
+        $file = $app->repo('RegistrationFile')->findBy([
+            'owner' => $registration,
+            'group' => $fileGroup
+        ]);
+        //dump($file);
+        if(count($file) > 0) {
+            //dump(count($file));
+            return $file;
+        }
     }
 }
 
