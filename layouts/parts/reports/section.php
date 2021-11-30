@@ -27,6 +27,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
     <?php 
         $check = 'Não confirmado';
         foreach ($field as $fields) :
+           
     ?>
 
     <span class="span-section">
@@ -88,6 +89,27 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                 echo trim(preg_replace('/\PL/u', ' ', $valueMeta->value));
 
             }
+            // if(is_array($fields['config'])) {
+            //     foreach ($fields['config'] as $keyConf => $valConf) { 
+            //         if($fields['config']['require']['condition'] == "1") {
+                        
+            //             //dump($valConf['field']);
+            //             $valDep = '';
+            //             foreach ($valConf as $key2 => $value2) {
+            //                 dump($value2);
+            //                 if($key2 == 'value') {
+            //                     $valDep = $value2;
+            //                 }
+                            
+            //             }
+            //             //dump($valConf['value']);
+            //             // dump($valConf['value']);
+            //             $show = Pdf::getDependenciesField($reg, $valConf['field'], $valDep);
+            //             dump($show);
+            //         }
+            //     }
+            // }
+
         }
             
         if($fields['fieldType'] === 'brPhone' || $fields['fieldType'] == 'number') {
@@ -96,12 +118,18 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
         }else
         
         if ($fields['fieldType'] ==  'agent-owner-field') {    
-
-            Pdf::showAgenteOwnerField($fields['config']['entityField'], $valueMeta->value, $agentMetaData);
+            $meta = null;
+            // dump($valueMeta->value);
+            // dump($agentMetaData);
+            if(isset($valueMeta->value) && $valueMeta->value !== "") {
+                $meta = $valueMeta->value;
+            }
+            Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
         }
         ?></span><br>
     <?php
         endforeach;
+        //die;
     ?>
 
 </div>
