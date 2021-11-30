@@ -3,6 +3,7 @@ namespace PDFReport\Entities;
 
 use MapasCulturais\App;
 use MapasCulturais\RegistrationMeta;
+use DateTime;
 
 class Pdf extends \MapasCulturais\Entity{
 
@@ -85,13 +86,12 @@ class Pdf extends \MapasCulturais\Entity{
     }
     
     static public function showAgenteOwnerField($field, $metaData, $owner) {
-
+        //dump($metaData);
         if ($field == '@location') {
-            self::showAddress($metaData);
+            echo $owner['endereco'];
         }else
-        if( $field == '@terms:area' || $field == "genero" ||
-            $field == 'longDescription' ||
-            $field == 'telefone1' || $field == 'telefone2'){
+        if( $field == '@terms:area' ||
+            $field == 'longDescription'){
             echo trim(preg_replace('/\PL/u', ' ', $metaData));          
         }elseif( $field == 'name' ) {
 
@@ -108,6 +108,19 @@ class Pdf extends \MapasCulturais\Entity{
 
         }elseif( $field == 'shortDescription') {
             echo $owner['shortDescription'];
+        }elseif( $field == 'documento') {
+            echo $owner['documento'];
+        }
+        elseif( $field == 'dataDeNascimento') {
+            $date = DateTime::createFromFormat('Y-m-d', $owner['dataDeNascimento']);
+            echo $date->format('d/m/Y');
+        }elseif( $field == "genero") {
+            echo $owner['genero'];
+        }elseif( $field == 'telefone1' || $field == 'telefone2') {
+            echo $owner[$field];
+        }
+        elseif( $field == 'emailPrivado' || $field == 'emailPublico') {
+            echo $owner[$field];
         }
         else{
 
@@ -159,6 +172,25 @@ class Pdf extends \MapasCulturais\Entity{
             echo trim(preg_replace('/\PL/u', ' ', $metaData));
         }
     }
-    //static public function getAgente
+    static public function getDependenciesField($registration, $field, $valueDependence) {
+        //$field é o ID DO FIELD
+        $app = App::i();
+       
+        $regField = $app->repo('RegistrationMeta')->findBy([
+            'owner' =>$registration,
+            'key' => $field
+        ]);
+        $show = false;
+        //dump($regField);
+        foreach ($regField as $key => $value) {
+           // dump($value->value);
+            if($valueDependence == $value->value) {
+               
+                $show = true;
+           }
+        }
+       // dump($show);
+        return $show;
+    }
 }
 
