@@ -86,46 +86,38 @@ class Pdf extends \MapasCulturais\Entity{
     }
     
     static public function showAgenteOwnerField($field, $metaData, $owner) {
-        //dump($metaData);
+        // dump($owner);
+        // dump($field);
         if ($field == '@location') {
             echo $owner['endereco'];
         }else
         if( $field == '@terms:area' ||
             $field == 'longDescription'){
             echo trim(preg_replace('/\PL/u', ' ', $metaData));          
-        }elseif( $field == 'name' ) {
+        }elseif($field == 'name' || $field == 'nomeCompleto' || $field == 'shortDescription' ||
+                $field == "genero" || $field == 'telefone1' || $field == 'telefone2' || $field == 'emailPrivado' || $field == 'emailPublico') {
 
-           echo $owner['name'];
-
-        }elseif( $field == 'nomeCompleto' ) {
-
-           echo $owner['nomeCompleto'];
+           echo $owner[$field];
 
         }elseif($field == "facebook" || $field == "intagram" || 
                 $field == "twitter" || $field == "site" || 
                 $field == "googleplus"){
             echo str_replace(array('\\', '"'), '', $metaData); 
 
-        }elseif( $field == 'shortDescription') {
-            echo $owner['shortDescription'];
-        }elseif( $field == 'documento') {
-            echo $owner['documento'];
         }
         elseif( $field == 'dataDeNascimento') {
+            
             $date = DateTime::createFromFormat('Y-m-d', $owner['dataDeNascimento']);
             echo $date->format('d/m/Y');
-        }elseif( $field == "genero") {
-            echo $owner['genero'];
-        }elseif( $field == 'telefone1' || $field == 'telefone2') {
-            echo $owner[$field];
-        }
-        elseif( $field == 'emailPrivado' || $field == 'emailPublico') {
-            echo $owner[$field];
-        }
-        else{
 
-            echo trim(preg_replace('/\PL/u', ' ', $metaData));
-            
+        }elseif($field == 'documento') { // PARA FORMATAR CPF OU CNPJ
+
+            $str = strlen($owner[$field]);
+            if($str == 11) {
+                echo self::mask($owner[$field],'###.###.###-##');
+            }else{
+                echo self::mask($owner[$field],'##.###.###/####-##');
+            }
         }
 
     }
@@ -173,27 +165,43 @@ class Pdf extends \MapasCulturais\Entity{
         }
     }
 
-    static public function getDependenciesField($registration, $field, $valueDependence) {
+    static public function getDependenciesField($registration, $fields) {
         //$field é o ID DO FIELD
         $app = App::i();
        
+        $show = true;
+        $fieldRegMeta = '';
+        $valueRegMeta = '';
+        if(is_array($fields['config'])) {    
+            foreach ($fields['config'] as $keyConf => $valConf) {
+                if(isset($valConf['value'])) {
+                   $valueRegMeta = $valConf['value'];                   
+                   $fieldRegMeta = $valConf['field'];                   
+                }
+            }
+        }
+      
         $regField = $app->repo('RegistrationMeta')->findBy([
             'owner' =>$registration,
-            'key' => $field
+            'key' => $fieldRegMeta
         ]);
-        $show = false;
-        //dump($regField);
-        foreach ($regField as $key => $value) {
-           // dump($value->value);
-            if($valueDependence == $value->value) {
-               
-                $show = true;
-           }
+
+        foreach ($regField as $key => $valregField) {
+            if($valueRegMeta !== $valregField->value) {
+                $show = false;
+            }
         }
-       // dump($show);
-        return $show;
+        //dump($show);
+       return $show;
     }
 
+    /**
+     * Metodo para verificação dos arquivos enviados na oportunidade
+     *
+     * @param [type] $registration
+     * @param [type] $fileGroup
+     * @return void
+     */
     static public function getFileRegistration($registration, $fileGroup) {
         $app = App::i();
         //dump($fileGroup);
@@ -206,6 +214,12 @@ class Pdf extends \MapasCulturais\Entity{
             //dump(count($file));
             return $file;
         }
+    }
+    
+    static public function showSpanFieldValue($fields, $fieldValueAll, $valueMetas) {
+       dump($fields);
+       dump($fieldValueAll);
+       dump($valueMetas);
     }
 }
 
