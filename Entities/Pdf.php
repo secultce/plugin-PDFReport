@@ -239,10 +239,41 @@ class Pdf extends \MapasCulturais\Entity{
         }
     }
     
-    static public function showSpanFieldValue($fields, $fieldValueAll, $valueMetas) {
-       dump($fields);
-       dump($fieldValueAll);
-       dump($valueMetas);
+    static public function showAllFieldAndFile($registrationOpportunity) {
+        $fields = [];
+        foreach ($registrationOpportunity->registrationFieldConfigurations as $field) {
+   
+            array_push($fields , [
+                        'displayOrder' => $field->displayOrder,
+                        'id' => $field->id,
+                        'title' => $field->title,
+                        'description' => $field->description,
+                        'fieldType' => $field->fieldType,
+                        'config' => $field->config,
+                        'owner' => $field->owner                        
+                    ]);
+        }
+
+        if($registrationOpportunity->registrationFileConfigurations->count() > 0) {
+            // echo '<br/><span class="span-section"><i>Arquivos</i></span><br>';
+            foreach ($registrationOpportunity->registrationFileConfigurations as $key => $file) {
+            //     // dump($key);
+           // dump($file->multiple);
+            array_push($fields , [
+                'displayOrder' => $file->displayOrder,
+                'id' => $file->id,
+                'title' => $file->title,
+                'description' => $file->description,
+                'fieldType' => 'file',
+                'config' => $field->metadata,
+                'owner' => $field->owner,
+                'multiple' => $field->multiple     
+            ]);
+            }
+        }
+        sort($fields);
+        return  $fields;
+
     }
 }
 

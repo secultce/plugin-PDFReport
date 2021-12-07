@@ -102,46 +102,16 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                     }
                     Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
                 }
+                //dump($fields);
+         
             ?>
             </span><br />
             <?php  endif;    
                 endforeach;
-
-        $fileRegistration = [];
-        if($reg->opportunity->registrationFileConfigurations->count() > 0) {
-            echo '<br/><span class="span-section"><i>Arquivos</i></span><br>';
-            foreach ($reg->opportunity->registrationFileConfigurations as $key => $file) {
-               
-                echo '<span class="my-registration-fields">'.$file->title.' : </span>';
+        
                 
-                $getfile = Pdf::getFileRegistration($reg, $file->fileGroupName);
-                if(!is_null($getfile)) {
-                    array_push($fileRegistration, $getfile);    
-                }else{
-                    echo '<span class="my-registration-fields-span"><i>Arquivo não encontrado</i> </span>';
-                }
-                              
-            }
-        }
-        asort($fileRegistration);
-
-        if(!is_null($fileRegistration)){
-            foreach ($fileRegistration as  $fileReg) {
-           
-                if(is_array($fileReg)) {
-                   
-                    foreach ($fileReg as $valueFile) {
-                       
-                        $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
                 
-                        $url = $app->createUrl($controllerId, 'privateFile', [$valueFile->id]);
-                        //dump($valueFile->name.' - '.$url);
-                        echo '<span class="my-registration-fields-span"><a href="'.$url.'">'.$valueFile->name.'</a></span><br>';
-                    }
-                }
-            }
-        }
-        //die;
+        die;
     ?>
 
 </div>

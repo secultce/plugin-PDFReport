@@ -259,25 +259,14 @@ class Pdf extends \MapasCulturais\Controller{
         //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
-        $fields = [];
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
-        foreach ($reg->opportunity->registrationFieldConfigurations as $field) {
+        $fields = EntitiesPdf::showAllFieldAndFile($reg->opportunity);
        
-            array_push($fields , [
-                        'displayOrder' => $field->displayOrder,
-                        'id' => $field->id,
-                        'title' => $field->title,
-                        'description' => $field->description,
-                        'fieldType' => $field->fieldType,
-                        'config' => $field->config,
-                        'owner' => $field->owner                        
-                    ]);
-        }
-       //die;
         
         //ORDENANDO O ARRAY EM ORDEM DE ID
-        sort($fields);
-
+       
+        dump($fields);
+        die;
         $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
 

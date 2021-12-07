@@ -169,4 +169,5 @@ include_once('header-pdf.php');
     </div>
     <?php
 $fieldOp = $app->view->regObject['fieldsOpportunity'];
+
 $this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
