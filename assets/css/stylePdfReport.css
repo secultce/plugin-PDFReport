@@ -219,13 +219,12 @@ body {
 .table-info-cat {
    margin-top: 10px;
    margin-bottom: 10px;
-   background: #E8E8E8;
-   border: 2px solid #E8E8E8 !important;
+   background: #1F4E37;
+   border: 2px solid #1F4E37 !important;
    padding: 10px;
    left: 8px;
-   color: black !important;
-   border-top-left-radius: 15px 15px;
-   border-top-right-radius: 15px 15px;
+   color: white !important;
+   border-radius: 15px;
 }
 .text-left{
    text-align: left;
