@@ -25,7 +25,7 @@
                     }
                 ?>
                 <th class="text-left" width="25%">Inscrição</th>
-                <th class="text-left" width="40%">Agentes candidatos</th>
+                <th class="text-left" width="40%">Candidatos</th>
                 <th class="text-center" width="10%"><?php echo !isset($preliminary) ? "RP" : "NF" ?></th>
             </tr>
         </thead>

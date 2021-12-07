@@ -18,7 +18,7 @@
             <thead>
                 <tr>
                     <th class="text-center" width="30%">Inscrição</th>
-                    <th class="text-center" width="50%">Agentes candidatos</th>
+                    <th class="text-center" width="50%">Candidatos</th>
                     <th class="text-center" width="20%">Status</th>
                 </tr>
             </thead>
