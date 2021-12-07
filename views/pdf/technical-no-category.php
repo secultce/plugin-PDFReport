@@ -19,7 +19,11 @@
     <table id="table-preliminar" width="100%">
         <thead>
             <tr>
-                <th class="text-center" width="25%">Classificação</th>
+                <?php 
+                    if(isset($preliminary)){
+                        echo '<th class="text-left" width="25%">Classificação</th>';
+                    }
+                ?>
                 <th class="text-left" width="25%">Inscrição</th>
                 <th class="text-left" width="40%">Agentes candidatos</th>
                 <th class="text-center" width="10%"><?php echo !isset($preliminary) ? "RP" : "NF" ?></th>
@@ -30,7 +34,11 @@
             foreach($sub as $key => $nameSub){ 
                     ?>
                     <tr>
-                        <td class="text-center"><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td>
+                        <?php 
+                            if(isset($preliminary)){ ?>
+                                <td class="text-left"><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td>
+                            <?php }
+                        ?>
                         <td class="text-left"><?php echo $nameSub->number; ?></td>
                         <td class="text-left"><?php echo $nameSub->owner->name; ?></td>
                         <td class="text-center"><?php echo !isset($preliminary) ? $nameSub->preliminaryResult : $nameSub->consolidatedResult; ?></td>
