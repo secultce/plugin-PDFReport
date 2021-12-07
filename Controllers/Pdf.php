@@ -49,6 +49,15 @@ class Pdf extends \MapasCulturais\Controller{
         $mpdf->SetDisplayMode('fullpage');
         $mpdf->SetTitle('Mapa da Saúde - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
+        $mpdf->AddPage('', // L - landscape, P - portrait 
+                '', '', '', '',
+                5, // margin_left
+                5, // margin right
+                10, // margin top
+                0, // margin bottom
+                0, // margin header
+                0
+            ); // margin footer
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
         $mpdf->Output();

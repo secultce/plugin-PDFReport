@@ -19,17 +19,17 @@
     <?php 
     foreach ($opp->registrationCategories as $key_first => $nameCat) :?>
         <div class="table-info-cat">
-            <?php echo $nameCat; ?>
+            <span><?php echo $nameCat; ?></span>
         </div>
         <table id="table-preliminar" width="100%">
             <thead>
-                <tr>
+                <tr style="border: 1px solid #CFDCE5;">
                     <?php 
                         if(isset($preliminary)){
                             echo '<th class="text-left" width="25%">Classificação</th>';
                         }
                     ?>
-                    <th class="text-left" width="25%">Inscrição</th>
+                    <th class="text-left" style="margin-top: 5px;" width="25%">Inscrição</th>
                     <th class="text-left" width="40%">Candidatos</th>
                     <th class="text-center" width="10%"><?php echo !isset($preliminary) ? "RP" : "NF" ?></th>
                 </tr>
