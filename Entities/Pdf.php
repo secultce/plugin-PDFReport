@@ -35,6 +35,15 @@ class Pdf extends \MapasCulturais\Entity{
         return $maskared;
     }
 
+    static public function clearCPF_CNPJ($valor){
+        $valor = trim($valor);
+        $valor = str_replace(".", "", $valor);
+        $valor = str_replace(",", "", $valor);
+        $valor = str_replace("-", "", $valor);
+        $valor = str_replace("/", "", $valor);
+        return $valor;
+       }
+
     /**
      * Metodo que converte uma string de json em array
      *
@@ -86,10 +95,24 @@ class Pdf extends \MapasCulturais\Entity{
     }
     
     static public function showAgenteOwnerField($field, $metaData, $owner) {
-        // dump($owner);
-        // dump($field);
+        
         if ($field == '@location') {
-            echo $owner['endereco'];
+            if($owner['En_Complemento'] !== '') {
+                print_r("CEP: ".$owner['En_CEP'].', 
+                Logradouro: '.$owner['En_Nome_Logradouro'].', 
+                Nº: '.$owner['En_Num'].', Comp: '.$owner['En_Complemento'].', 
+                Bairro: '.$owner['En_Bairro'].', 
+                Cidade: '.$owner['En_Municipio'].', 
+                UF: '.$owner['En_Estado']);
+            }else{
+                print_r("CEP: ".$owner['En_CEP'].', 
+                Logradouro: '.$owner['En_Nome_Logradouro'].', 
+                Nº: '.$owner['En_Num'].', 
+                Bairro: '.$owner['En_Bairro'].', 
+                Cidade: '.$owner['En_Municipio'].', 
+                UF: '.$owner['En_Estado']);
+            }
+            
         }else
         if( $field == '@terms:area' ||
             $field == 'longDescription'){
@@ -111,12 +134,12 @@ class Pdf extends \MapasCulturais\Entity{
             echo $date->format('d/m/Y');
 
         }elseif($field == 'documento') { // PARA FORMATAR CPF OU CNPJ
-
-            $str = strlen($owner[$field]);
+            $doc =  self::clearCPF_CNPJ($owner[$field]); // retirando formatação caso venha
+            $str = strlen($doc); // total de carecteres
             if($str == 11) {
-                echo self::mask($owner[$field],'###.###.###-##');
+                echo self::mask($doc,'###.###.###-##');
             }else{
-                echo self::mask($owner[$field],'##.###.###/####-##');
+                echo self::mask($doc,'##.###.###/####-##');
             }
         }
 

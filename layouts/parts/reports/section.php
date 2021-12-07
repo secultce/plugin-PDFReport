@@ -47,6 +47,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
             <span style="width: 20px; text-align: justify-all; font-size: 10px">
             <?php 
                 foreach ($valueMetas as $keyMeta => $valueMeta) {
+
                     if($fields['fieldType'] == 'checkbox') {  
                         if($valueMeta->value) {
                             echo $fields['description'];
@@ -92,20 +93,14 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
 
                     }
                 } 
-                if($fields['fieldType'] == 'number') {
-                        
-                    echo $valueMeta->value;
-                    
-                }else
-                
-                if ($fields['fieldType'] ==  'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
+                                
+                if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
                     $meta = null;
-                    if(isset($valueMeta->value) && $valueMeta->value !== "") {
+                    
+                    if($valueMeta->value !== "") {
                         $meta = $valueMeta->value;
                     }
-
                     Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
-
                 }
             ?>
             </span><br />
