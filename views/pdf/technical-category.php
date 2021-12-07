@@ -17,7 +17,7 @@
 ?>
 <div class="container">
     <?php 
-    foreach ($opp->registrationCategories as $key => $nameCat) :?>
+    foreach ($opp->registrationCategories as $key_first => $nameCat) :?>
         <div class="table-info-cat">
             <?php echo $nameCat; ?>
         </div>
@@ -36,13 +36,15 @@
             </thead>
             <tbody>
                 <?php 
-                foreach($sub as $key => $nameSub){ 
+                $countArray = [];
+                foreach($sub as $key => $nameSub){
                     if($nameCat == $nameSub->category){
+                        $countArray[$nameCat][] = $key;
                         ?>
                         <tr>
                             <?php 
                                 if(isset($preliminary)){ ?>
-                                    <td class="text-left"><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td>
+                                    <td class="text-left"><?php echo count($countArray[$nameCat]) ?> </td>
                                 <?php }
                             ?>
                             <td class="text-left"><?php echo $nameSub->number; ?></td>

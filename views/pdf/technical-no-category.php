@@ -36,7 +36,7 @@
                     <tr>
                         <?php 
                             if(isset($preliminary)){ ?>
-                                <td class="text-left"><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td>
+                                <td class="text-left"><?php echo $key; ?> </td>
                             <?php }
                         ?>
                         <td class="text-left"><?php echo $nameSub->number; ?></td>
