@@ -151,7 +151,7 @@ class Pdf extends \MapasCulturais\Entity{
         }
 
         if($period) {
-            $array['regs'] = self::oportunityAllRegistration($getData['idopportunityReport'], 10);
+            $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
             if(empty($array['regs']['regs'])){
                 self::handleRedirect('Ops! Para gerar o relatório definitivo a oportunidade deve estar publicada.', 401, $getData['idopportunityReport']);
             }
@@ -169,13 +169,13 @@ class Pdf extends \MapasCulturais\Entity{
                 }
             }
             if($countPublish == count($resource) && $countPublish > 0 && count($resource) > 0) {
-                $array['regs'] = self::oportunityAllRegistration($getData['idopportunityReport'], 10);
+                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
                 $array['title'] = 'Resultado Definitivo do Certame';
                 $array['template'] = 'pdf/definitive';
                
             }else if($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
                
-                $array['regs'] = self::oportunityAllRegistration($getData['idopportunityReport'], 10);
+                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
                 
                 if(empty($array['regs']['regs'])) {
                     self::handleRedirect('Ops! Você deve publicar a oportunidade para esse relatório.', 401, $getData['idopportunityReport']);
@@ -197,7 +197,7 @@ class Pdf extends \MapasCulturais\Entity{
                     $app->redirect($app->createUrl('oportunidade/'.$getData['idopportunityReport'].'#/tab=inscritos'), 401);
                 }
             }else{
-                $array['regs'] = self::oportunityAllRegistration($getData['idopportunityReport'], 10);
+                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
                 $array['title'] = 'Resultado Definitivo do Certame';
                 $array['template'] = 'pdf/definitive';
             }
