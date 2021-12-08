@@ -28,7 +28,6 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
         $check = 'Não confirmado';
         $fieldValueAll = [];
         foreach ($field as $fie => $fields) :
-           
             $valueMetas = Pdf::getValueField($fields['id'], $reg->id);
             
             $showSpan = Pdf::getDependenciesField($reg, $fields);
@@ -47,7 +46,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
             <span style="width: 20px; text-align: justify-all; font-size: 10px">
             <?php 
                 foreach ($valueMetas as $keyMeta => $valueMeta) {
-
+                    // dump($valueMeta);
                     if($fields['fieldType'] == 'checkbox') {  
                         if($valueMeta->value) {
                             echo $fields['description'];
@@ -97,10 +96,21 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                 if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
                     $meta = null;
                     
-                    if($valueMeta->value !== "") {
+                    if($valueMeta->value !== "" && isset($valueMeta->value)) {
                         $meta = $valueMeta->value;
                     }
                     Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
+                }
+
+                if ($fields['fieldType'] == 'file') { 
+                    echo $fields['title'];
+                    // $file = Pdf::getFileRegistration($reg, $file->fileGroupName);
+                    // dump($file);
+                    // $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
+
+                    // $url = $app->createUrl($controllerId, 'privateFile', [$valueFile->id]);
+                    // //dump($valueFile->name.' - '.$url);
+                    // echo '<a href="'.$url.'">'.$valueFile->name.'</a><br>';
                 }
                 //dump($fields);
          
@@ -108,10 +118,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
             </span><br />
             <?php  endif;    
                 endforeach;
-        
-                
-                
-        die;
+//die;
     ?>
 
 </div>

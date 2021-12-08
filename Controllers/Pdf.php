@@ -264,9 +264,6 @@ class Pdf extends \MapasCulturais\Controller{
        
         
         //ORDENANDO O ARRAY EM ORDEM DE ID
-       
-        dump($fields);
-        die;
         $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
 

@@ -214,7 +214,7 @@ class Pdf extends \MapasCulturais\Entity{
                 $show = false;
             }
         }
-        //dump($show);
+
        return $show;
     }
 
@@ -240,40 +240,41 @@ class Pdf extends \MapasCulturais\Entity{
     }
     
     static public function showAllFieldAndFile($registrationOpportunity) {
-        $fields = [];
+        $fields = []; // array vazio
+        
         foreach ($registrationOpportunity->registrationFieldConfigurations as $field) {
-   
+            //ATRIBUINDO ARRAY DOS CAMPOS AO ARRAY
             array_push($fields , [
-                        'displayOrder' => $field->displayOrder,
-                        'id' => $field->id,
-                        'title' => $field->title,
-                        'description' => $field->description,
-                        'fieldType' => $field->fieldType,
-                        'config' => $field->config,
-                        'owner' => $field->owner                        
-                    ]);
-        }
-
-        if($registrationOpportunity->registrationFileConfigurations->count() > 0) {
-            // echo '<br/><span class="span-section"><i>Arquivos</i></span><br>';
-            foreach ($registrationOpportunity->registrationFileConfigurations as $key => $file) {
-            //     // dump($key);
-           // dump($file->multiple);
-            array_push($fields , [
-                'displayOrder' => $file->displayOrder,
-                'id' => $file->id,
-                'title' => $file->title,
-                'description' => $file->description,
-                'fieldType' => 'file',
-                'config' => $field->metadata,
-                'owner' => $field->owner,
-                'multiple' => $field->multiple     
+                'displayOrder' => $field->displayOrder,
+                'id' => $field->id,
+                'title' => $field->title,
+                'description' => $field->description,
+                'fieldType' => $field->fieldType,
+                'config' => $field->config,
+                'owner' => $field->owner                        
             ]);
+        }
+        //VERIFICANDO DE TEM ARQUVIOS
+        if($registrationOpportunity->registrationFileConfigurations->count() > 0) {
+            
+            foreach ($registrationOpportunity->registrationFileConfigurations as $key => $file) {
+
+                array_push($fields , [
+                    'displayOrder' => $file->displayOrder,
+                    'id' => $file->id,
+                    'title' => $file->title,
+                    'description' => $file->description,
+                    'fieldType' => 'file',
+                    'config' => $field->metadata,
+                    'owner' => $field->owner,
+                    'multiple' => $field->multiple     
+                ]);
             }
         }
-        sort($fields);
-        return  $fields;
-
+        $column_order = array_column( $fields, 'displayOrder' );
+        array_multisort( $column_order, SORT_ASC, $fields );
+        
+        return $fields;
     }
 }
 
