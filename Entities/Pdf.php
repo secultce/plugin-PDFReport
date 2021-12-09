@@ -97,7 +97,7 @@ class Pdf extends \MapasCulturais\Entity{
     static public function showAgenteOwnerField($field, $metaData, $owner) {
         
         if ($field == '@location') {
-            if($owner['En_Complemento'] !== '') {
+            if(!is_null($owner['En_Complemento'])) {
                 print_r("CEP: ".$owner['En_CEP'].', 
                 Logradouro: '.$owner['En_Nome_Logradouro'].', 
                 Nº: '.$owner['En_Num'].', Comp: '.$owner['En_Complemento'].', 
@@ -261,13 +261,28 @@ class Pdf extends \MapasCulturais\Entity{
             
             foreach ($registrationOpportunity->registrationFileConfigurations as $key => $file) {
                 $fileRegistration = self::getFileRegistration($registration, $file->fileGroupName);
+                
                 $registrationFile = (array) $fileRegistration;
                 $config = [];
-                foreach ($registrationFile as $key => $conf) {
-                    $config['id']       = $conf->id;
-                    $config['group']    = $conf->group;
-                    $config['name']     = $conf->name;
-                    $config['owner']    = $conf->owner;
+                //
+                if($file->multiple) {
+                    foreach ($registrationFile as $key => $fileValue) {                       
+                        array_push($config, [
+                            'id'    => $fileValue->id,
+                            'group' => $fileValue->group,
+                            'name'  => $fileValue->name,
+                            'owner' => $fileValue->owner
+                        ]);
+                    }
+                }else {
+                    foreach ($registrationFile as $key => $conf) {
+                        array_push($config, [
+                            'id'    => $conf->id,
+                            'group' => $conf->group,
+                            'name'  => $conf->name,
+                            'owner' => $conf->owner
+                        ]);
+                    }
                 }
                 array_push($fields , [
                     'displayOrder' => $file->displayOrder,
@@ -276,8 +291,8 @@ class Pdf extends \MapasCulturais\Entity{
                     'description' => $file->description,
                     'fieldType' => 'file',
                     'config' => $config,
-                    'owner' => $field->owner,
-                    'multiple' => $field->multiple     
+                    'owner' => $file->owner,
+                    'multiple' => $file->multiple     
                 ]);
             }
         }

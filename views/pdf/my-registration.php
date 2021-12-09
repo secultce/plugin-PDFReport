@@ -9,9 +9,9 @@ include_once('header-pdf.php');
     <thead>
         <tr>
             <td>
-                <?php if (!empty($reg->opportunity->getFile('header'))) : ?>
+                <?php if (!empty($reg->opportunity->getFile('img:header'))) : ?>
                 <div>
-                    <img src="<?php echo $reg->opportunity->getFile('header')->path; ?>" alt="">
+                    <img src="<?php echo $reg->opportunity->getFile('img:header')->path; ?>" alt="">
                 </div>
                 <?php endif; ?>
             </td>

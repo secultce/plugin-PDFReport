@@ -94,7 +94,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                 if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
                     $meta = null;
                     
-                    if($valueMeta->value !== "" && isset($valueMeta->value)) {
+                    if(isset($valueMeta) && $valueMeta->value !== "" && isset($valueMeta->value)) {
                         $meta = $valueMeta->value;
                     }
                     Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
@@ -106,18 +106,21 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                     $id = 0;
                     $name = '';
                     if( !empty($fields['config']) ) {
-                        $id   = $fields['config']['id'];
-                        $name = $fields['config']['name'];
+                        foreach ($fields['config'] as $conf) {
+                            $id   = $conf['id'];
+                            $name = $conf['name'];
+                            $url = $app->createUrl($controllerId, 'privateFile', [$id]);
+                            echo '<br /><a href="'.$url.'"> '.$name.'</a>';
+                        }
+                    }else{
+                        echo 'Arquivo não enviado.';
                     };
-                    $url = $app->createUrl($controllerId, 'privateFile', [$id]);
-                    echo '<a href="'.$url.'"> '.$name.'</a>';
                 }
             ?>
             </span><br />
             <?php  endif;    
         endforeach;
     ?>
-
 </div>
     </main>
 
