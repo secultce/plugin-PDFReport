@@ -189,32 +189,34 @@ class Pdf extends \MapasCulturais\Entity{
     }
 
     static public function getDependenciesField($registration, $fields) {
-        //$field é o ID DO FIELD
+      
         $app = App::i();
-       
         $show = true;
         $fieldRegMeta = '';
         $valueRegMeta = '';
-        if(is_array($fields['config'])) {    
-            foreach ($fields['config'] as $keyConf => $valConf) {
-                if(isset($valConf['value'])) {
-                   $valueRegMeta = $valConf['value'];                   
-                   $fieldRegMeta = $valConf['field'];                   
+
+        if($fields['fieldType'] !== 'file'){
+            if(is_array($fields['config'])) {    
+                foreach ($fields['config'] as $keyConf => $valConf) {
+                    if(isset($valConf['value'])) {
+                       $valueRegMeta = $valConf['value'];                   
+                       $fieldRegMeta = $valConf['field'];                   
+                    }
+                }
+            }
+            
+            $regField = $app->repo('RegistrationMeta')->findBy([
+                'owner' =>$registration,
+                'key' => $fieldRegMeta
+            ]);
+           
+            foreach ($regField as $key => $valregField) {
+                if($valueRegMeta !== $valregField->value) {
+                    $show = false;
                 }
             }
         }
-      
-        $regField = $app->repo('RegistrationMeta')->findBy([
-            'owner' =>$registration,
-            'key' => $fieldRegMeta
-        ]);
-
-        foreach ($regField as $key => $valregField) {
-            if($valueRegMeta !== $valregField->value) {
-                $show = false;
-            }
-        }
-
+        
        return $show;
     }
 
@@ -227,21 +229,21 @@ class Pdf extends \MapasCulturais\Entity{
      */
     static public function getFileRegistration($registration, $fileGroup) {
         $app = App::i();
-        //dump($fileGroup);
+
         $file = $app->repo('RegistrationFile')->findBy([
             'owner' => $registration,
             'group' => $fileGroup
         ]);
-        //dump($file);
+
         if(count($file) > 0) {
-            //dump(count($file));
             return $file;
         }
     }
     
-    static public function showAllFieldAndFile($registrationOpportunity) {
+    static public function showAllFieldAndFile($registration) {
         $fields = []; // array vazio
-        
+
+        $registrationOpportunity = $registration->opportunity;
         foreach ($registrationOpportunity->registrationFieldConfigurations as $field) {
             //ATRIBUINDO ARRAY DOS CAMPOS AO ARRAY
             array_push($fields , [
@@ -258,14 +260,22 @@ class Pdf extends \MapasCulturais\Entity{
         if($registrationOpportunity->registrationFileConfigurations->count() > 0) {
             
             foreach ($registrationOpportunity->registrationFileConfigurations as $key => $file) {
-
+                $fileRegistration = self::getFileRegistration($registration, $file->fileGroupName);
+                $registrationFile = (array) $fileRegistration;
+                $config = [];
+                foreach ($registrationFile as $key => $conf) {
+                    $config['id']       = $conf->id;
+                    $config['group']    = $conf->group;
+                    $config['name']     = $conf->name;
+                    $config['owner']    = $conf->owner;
+                }
                 array_push($fields , [
                     'displayOrder' => $file->displayOrder,
                     'id' => $file->id,
                     'title' => $file->title,
                     'description' => $file->description,
                     'fieldType' => 'file',
-                    'config' => $field->metadata,
+                    'config' => $config,
                     'owner' => $field->owner,
                     'multiple' => $field->multiple     
                 ]);

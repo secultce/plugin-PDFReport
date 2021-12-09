@@ -31,7 +31,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
             $valueMetas = Pdf::getValueField($fields['id'], $reg->id);
             
             $showSpan = Pdf::getDependenciesField($reg, $fields);
-            
+           
             if($showSpan == true): ?>
                 <span class="span-section">
                 <?php
@@ -88,8 +88,6 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                         
                     }else if($fields['fieldType'] !== 'agent-owner-field')  {
                         echo $valueMeta->value;
-                        //echo trim(preg_replace('/\PL/u', ' ', $valueMeta->value));
-
                     }
                 } 
                                 
@@ -103,22 +101,21 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                 }
 
                 if ($fields['fieldType'] == 'file') { 
-                    echo $fields['title'];
-                    // $file = Pdf::getFileRegistration($reg, $file->fileGroupName);
-                    // dump($file);
-                    // $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
-
-                    // $url = $app->createUrl($controllerId, 'privateFile', [$valueFile->id]);
-                    // //dump($valueFile->name.' - '.$url);
-                    // echo '<a href="'.$url.'">'.$valueFile->name.'</a><br>';
+                   
+                    $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
+                    $id = 0;
+                    $name = '';
+                    if( !empty($fields['config']) ) {
+                        $id   = $fields['config']['id'];
+                        $name = $fields['config']['name'];
+                    };
+                    $url = $app->createUrl($controllerId, 'privateFile', [$id]);
+                    echo '<a href="'.$url.'"> '.$name.'</a>';
                 }
-                //dump($fields);
-         
             ?>
             </span><br />
             <?php  endif;    
-                endforeach;
-//die;
+        endforeach;
     ?>
 
 </div>

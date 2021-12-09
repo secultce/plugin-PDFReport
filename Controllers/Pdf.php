@@ -260,7 +260,7 @@ class Pdf extends \MapasCulturais\Controller{
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
-        $fields = EntitiesPdf::showAllFieldAndFile($reg->opportunity);
+        $fields = EntitiesPdf::showAllFieldAndFile($reg);
        
         
         //ORDENANDO O ARRAY EM ORDEM DE ID
@@ -287,6 +287,7 @@ class Pdf extends \MapasCulturais\Controller{
         $mpdf->WriteHTML(ob_get_clean());
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
+        $file_name = 'Ficha_de_inscricao.pdf';
         $mpdf->Output();
         exit;
     }
