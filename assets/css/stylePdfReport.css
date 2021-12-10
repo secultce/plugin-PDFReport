@@ -112,16 +112,16 @@ body {
    font-family: Arial;
    font-style: normal;
    font-weight: bold;
-   font-size: 15px;
-   line-height: 11px;
+   font-size: 10px;
+   line-height: 8px;
    align-items: center;
 }
 
 .my-registration-fields-span {
    margin-top: 2px;
    margin-left: 8px;
-   font-size: 15px;
-   line-height: 11px;
+   font-size: 10px;
+   line-height: 8px;
    align-items: center;
 }
 
@@ -160,7 +160,7 @@ body {
    height: 400px;
    padding-left: 20px;
    padding-right: 20px;
-   line-height: 35px;
+   line-height: 20px;
 }
 
 .span-section {
@@ -170,8 +170,8 @@ body {
    font-family: Arial;
    font-style: normal;
    font-weight: bold;
-   font-size: 15px;
-   line-height: 20px;
+   font-size: 10px;
+   line-height: 10px;
    align-items: center;
 }
 
@@ -179,4 +179,12 @@ body {
    display: flex;
    flex-direction: column;
    align-items: flex-start;
+}
+
+.my-registration-category {
+   border: 1px solid #E8E8E8; 
+   border-radius: 8px; 
+   width: 100%; 
+   padding: 8px;
+   margin-bottom: 10px;
 }
