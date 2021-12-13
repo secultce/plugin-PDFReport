@@ -11,8 +11,8 @@
     <div class="container">
         <div class="pre-text">Resultado Preliminar</div>
         <div class="opportunity-info">
-            <p>Oportunidade: </p>
-            <h4><?php echo $nameOpportunity ?></h4>
+            <p class="text-opp">Oportunidade</p>
+            <h4 class="opp-name-relatorio"><?php echo $nameOpportunity ?></h4>
         </div>
     </div>
     <?php    
