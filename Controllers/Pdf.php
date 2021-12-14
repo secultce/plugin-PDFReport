@@ -60,7 +60,7 @@ class Pdf extends \MapasCulturais\Controller{
             ); // margin footer
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
-        $mpdf->Output();
+        $mpdf->Output('MapaDaSaude_Relatorio.pdf', 'I');
         exit;
     }
     
