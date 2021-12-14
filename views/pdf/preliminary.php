@@ -17,11 +17,11 @@
     </div>
     <?php    
         $type = $opportunity->evaluationMethodConfiguration->type->id;
-        if($opportunity->registrationCategories == "" &&  $type == 'technical'){
+        if($opportunity->registrationCategories == "" &&  ($type == 'technical' || $type == 'technicalna')){
             include_once('technical-no-category.php');
         }elseif($opportunity->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary'){
             include_once('simple-documentary-no-category.php');
-        }elseif($opportunity->registrationCategories !== "" &&  $type == 'technical'){
+        }elseif($opportunity->registrationCategories !== "" &&  ($type == 'technical' || $type == 'technicalna')){
             include_once('technical-category.php');
         }elseif($opportunity->registrationCategories !== "" &&  $type == 'simple'|| $type == 'documentary'){
             include_once('simple-documentary-category.php');

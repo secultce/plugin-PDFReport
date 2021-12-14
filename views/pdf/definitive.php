@@ -21,13 +21,13 @@
         //NAO TEM RECURSO OU DESABILITADO
         if(empty($claimDisabled) || $claimDisabled == 1) {
             // nao tem categoria, tecnica e nao tem recurso 
-            if($opp->registrationCategories == "" &&  $type == 'technical'){
+            if($opp->registrationCategories == "" &&  ($type == 'technical' || $type == 'technicalna')){
                 $preliminary = false;
                 include_once('technical-no-category.php');
             }elseif($opp->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary'){
                 $preliminary = false;
                 include_once('simple-documentary-no-category.php');
-            }elseif($opp->registrationCategories !== "" &&  $type == 'technical' ){
+            }elseif($opp->registrationCategories !== "" &&  $type == 'technical' || $type == 'technicalna' ){
                 $preliminary = false;
                 include_once('technical-category.php');
             }elseif($opp->registrationCategories !== "" &&  $type == 'simple' || $type == 'documentary'){
