@@ -5,7 +5,6 @@ use DateTime;
 use MapasCulturais\App;
 use Doctrine\ORM\Mapping as ORM;
 use MapasCulturais\RegistrationMeta;
-use DateTime;
 
 class Pdf extends \MapasCulturais\Entity{
 
@@ -245,6 +244,7 @@ class Pdf extends \MapasCulturais\Entity{
             $total += floatval($totalSection);
         }
         return $total / count($users);
+    }
     static public function clearCPF_CNPJ($valor){
         $valor = trim($valor);
         $valor = str_replace(".", "", $valor);
