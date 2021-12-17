@@ -1,5 +1,20 @@
 <?php
 use PDFReport\Entities\Pdf;
+
+/**
+ * RETORNO DE DOS METADATAS DO AGENTE COM OS INDICES SENDO O VALOR QUE ESTÁ 
+ * EM KEY NA TABELA E O RESULTADO SENDO O VALOR QUE ESTÁ EM VALUE NA TABELA
+ */
+$result = $reg->getAgentsData();
+unset($result['owner']['nomeCompleto ']);
+
+$newAgentData = [];
+$newAgentData['shortDescription'] = $reg->owner->shortDescription;
+$newAgentData['longDescription'] = $reg->owner->longDescription;
+$newAgentData['nomeCompleto'] = $reg->owner->nomeCompleto;
+
+$agentMetaData = array_merge($result['owner'], $newAgentData);
+
 ?>
 
 <div class="border-section">
@@ -11,96 +26,101 @@ use PDFReport\Entities\Pdf;
 
     <?php 
         $check = 'Não confirmado';
-        foreach ($field as $fields) :
+        $fieldValueAll = [];
+        foreach ($field as $fie => $fields) :
+            $valueMetas = Pdf::getValueField($fields['id'], $reg->id);
             
-    ?>
+            $showSpan = Pdf::getDependenciesField($reg, $fields);
+           
+            if($showSpan == true): ?>
+                <span class="span-section">
+                <?php
+                    if($fields['fieldType'] === 'section') {
+                        echo "<hr><br>";
+                        echo '<u>'.$fields['title'].'</u>';
+                    }else{
+                        echo $fields['title'].': ';
+                    }
+                ?>
+            </span>
+            <span style="width: 20px; text-align: justify-all; font-size: 10px">
+            <?php 
+                foreach ($valueMetas as $keyMeta => $valueMeta) {
+                    // dump($valueMeta);
+                    if($fields['fieldType'] == 'checkbox') {  
+                        if($valueMeta->value) {
+                            echo $fields['description'];
+                        }else{
+                            echo "Não informado";
+                        }
+                    }else if($fields['fieldType'] == 'cnpj') {
 
-    <span class="span-section">
-        <?php
-            if($fields['fieldType'] === 'section') {
-                echo "<hr><br>";
-                echo '<u>'.$fields['title'].'</u>';
-            }else{
-                echo $fields['title'].': ';
-            }
-            ?>
-    </span>
-    <span style="width: 20px; text-align: justify-all;"><?php 
-        $valueMetas = Pdf::getValueField($fields['id'], $reg->id); 
+                        echo Pdf::mask($valueMeta->value,'##.###.###/####-##');
 
-        foreach ($valueMetas as $keyMeta => $valueMeta) {
-            if($fields['fieldType'] == 'checkbox') {  
-                if($valueMeta->value) {
-                    echo $fields['description'];
-                }else{
-                    echo "Não informado";
-                }
-            }else if($fields['fieldType'] == 'cnpj') {
-                echo Pdf::mask($valueMeta->value,'##.###.###/####-##');
-            }else if($fields['fieldType'] == 'persons') {
-                $persons = json_decode($valueMeta->value, true);
-                $namesPersons = [];
-                foreach($persons as $person) {
-                    $namesPersons[] = $person['name'];
-                }
-                echo implode(", ", $namesPersons);
-            } else if ($fields['fieldType'] ==  'space-field') {
-                $endereco = json_decode($valueMeta->value, true);
+                    }else if($fields['fieldType'] == 'cpf') {
+                        
+                        echo Pdf::mask($valueMeta->value,'###.###.###-##');
+                    
+                    }else if($fields['fieldType'] == 'persons') {
 
-                $additional     = ( isset($endereco['En_Complemento'] ) && $endereco['En_Complemento'] != '' ) ? ", " . $endereco['En_Complemento']: "" ;
-                $neighborhood   = ( isset($endereco['En_Bairro'] ) && $endereco['En_Bairro'] != '' ) ? ", " . $endereco['En_Bairro']: "" ;
-                $city           = ( isset($endereco['En_Municipio'] ) && $endereco['En_Municipio'] != '' ) ? ", " . $endereco['En_Municipio']: "" ;
-                $state          = ( isset($endereco['En_Estado'] ) && $endereco['En_Estado'] != '' ) ? ", " . $endereco['En_Estado']: "" ;
-                $cep            = ( isset($endereco['En_CEP'] ) && $endereco['En_CEP'] != '' ) ? ", " . $endereco['En_CEP']: "" ;
-                $address_number = ( isset($endereco['En_Num'] ) && $endereco['En_Num'] != '' ) ? ", " . $endereco['En_Num']: "" ;
-                $street         = ( isset($endereco['En_Nome_Logradouro'] ) && $endereco['En_Nome_Logradouro'] != '' ) ? $endereco['En_Nome_Logradouro']: "" ;
-                //montando endereço caso o $endereco == null
-                $address = $street .  $address_number . $additional . $neighborhood . $cep . $city . $state;
+                        Pdf::showDecode($valueMeta->value, null, 'name');
 
-                echo $address;
-            } else if ($fields['fieldType'] ==  'agent-owner-field') {
-                if ($fields['config']['entityField'] == '@location') {
-                    $endereco = json_decode($valueMeta->value, true);
+                    } else if ($fields['fieldType'] == 'space-field') {
 
-                    $additional     = ( isset($endereco['En_Complemento'] ) && $endereco['En_Complemento'] != '' ) ? ", " . $endereco['En_Complemento']: "" ;
-                    $neighborhood   = ( isset($endereco['En_Bairro'] ) && $endereco['En_Bairro'] != '' ) ? ", " . $endereco['En_Bairro']: "" ;
-                    $city           = ( isset($endereco['En_Municipio'] ) && $endereco['En_Municipio'] != '' ) ? ", " . $endereco['En_Municipio']: "" ;
-                    $state          = ( isset($endereco['En_Estado'] ) && $endereco['En_Estado'] != '' ) ? ", " . $endereco['En_Estado']: "" ;
-                    $cep            = ( isset($endereco['En_CEP'] ) && $endereco['En_CEP'] != '' ) ? ", " . $endereco['En_CEP']: "" ;
-                    $address_number = ( isset($endereco['En_Num'] ) && $endereco['En_Num'] != '' ) ? ", " . $endereco['En_Num']: "" ;
-                    $street         = ( isset($endereco['En_Nome_Logradouro'] ) && $endereco['En_Nome_Logradouro'] != '' ) ? $endereco['En_Nome_Logradouro']: "" ;
-                    //montando endereço caso o $endereco == null
-                    $address = $street .  $address_number . $additional . $neighborhood . $cep . $city . $state;
-                    echo $address;
-                }
-            } else {
-                echo $valueMeta->value;
-            }
+                        Pdf::showSpaceField($fields['config']['entityField'] , $valueMeta->value);
 
-            // if($fields['fieldType'] == 'space-field') {
-            //     echo 'space-field';
-            // }
-        }
-               
-        /**
-         * RETORNO DE TODOS OS METADATAS DO AGENTE COM OS INDICES SENDO O VALOR QUE ESTÁ 
-         * EM KEY NA TABELA E O RESULTADO SENDO O VALOR QUE ESTÁ EM VALUE NA TABELA
-         */
-        $agentMetaData = $reg->getAgentsData();
-        //VERIFICANDO SE É O CAMPO É agent-owner-field
-        if($fields['fieldType'] == 'agent-owner-field') {
-            //PASSANDO O VALOR QUE VEM EM CONFIG PARA SABER SE TEM O VALOR DENTRO DO ARRAY $agentMetaData
-            if(isset($agentMetaData['owner'])) {
-                if(array_key_exists($fields['config']['entityField'], $agentMetaData['owner'])) {
-                    print_r($agentMetaData['owner'][$fields['config']['entityField']]);
+                    } else 
+                    if($fields['fieldType'] == 'date') {
+
+                        echo date("d/m/Y", strtotime($valueMeta->value));
+
+                    }else if($fields['fieldType'] == 'links') {
+
+                        Pdf::showDecode($valueMeta->value, 'title', 'value');
+
+                    }else if($fields['fieldType'] == 'checkboxes') {
+
+                        Pdf::showItensCheckboxes($valueMeta->value);
+
+                    }else if($fields['fieldType'] == 'agent-collective-field') {
+
+                        Pdf::showAgentCollectiveField($fields['config']['entityField'], $valueMeta->value );
+                        
+                    }else if($fields['fieldType'] !== 'agent-owner-field')  {
+                        echo $valueMeta->value;
+                    }
                 } 
-            }
-        }
+                                
+                if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
+                    $meta = null;
+                    
+                    if(isset($valueMeta) && $valueMeta->value !== "" && isset($valueMeta->value)) {
+                        $meta = $valueMeta->value;
+                    }
+                    Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
+                }
 
-        ?></span><br>
-    <?php
-        endforeach;      
+                if ($fields['fieldType'] == 'file') { 
+                   
+                    $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
+                    $id = 0;
+                    $name = '';
+                    if( !empty($fields['config']) ) {
+                        foreach ($fields['config'] as $conf) {
+                            $id   = $conf['id'];
+                            $name = $conf['name'];
+                            $url = $app->createUrl($controllerId, 'privateFile', [$id]);
+                            echo '<br /><a href="'.$url.'"> '.$name.'</a>';
+                        }
+                    }else{
+                        echo 'Arquivo não enviado.';
+                    };
+                }
+            ?>
+            </span><br />
+            <?php  endif;    
+        endforeach;
     ?>
-
 </div>
     </main>
+

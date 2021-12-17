@@ -72,9 +72,7 @@ class Pdf extends \MapasCulturais\Controller{
             $app->auth->requireAuthentication();
         }
 
-        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
-        'format' => 'A4',
-        'orientation' => 'L']);
+        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8','format' => 'A4']);
         
         $reg = $app->repo('Registration')->find($this->data['id']);
 
@@ -90,25 +88,11 @@ class Pdf extends \MapasCulturais\Controller{
         //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
-        $fields = [];
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
-        foreach ($reg->opportunity->registrationFieldConfigurations as $field) {
-         //   dump($fields);
-            array_push($fields , [
-                        'displayOrder' => $field->displayOrder,
-                        'id' => $field->id,
-                        'title' => $field->title,
-                        'description' => $field->description,
-                        'fieldType' => $field->fieldType,
-                        'config' => $field->config,
-                        'owner' => $field->owner                        
-                    ]);
-        }
-       // die;
+        $fields = EntitiesPdf::showAllFieldAndFile($reg);
+       
         
         //ORDENANDO O ARRAY EM ORDEM DE ID
-        sort($fields);
-
         $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
 
@@ -132,6 +116,7 @@ class Pdf extends \MapasCulturais\Controller{
         $mpdf->WriteHTML(ob_get_clean());
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
+        $file_name = 'Ficha_de_inscricao.pdf';
         $mpdf->Output();
         exit;
     }
