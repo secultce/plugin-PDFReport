@@ -50,9 +50,11 @@
             <tbody>
                 <?php 
                 $countArray = [];
+                $arrayCheck = [];
                 foreach($sub as $key => $nameSub){
                     if($nameCat == $nameSub->category){
                         $countArray[$nameCat][] = $key;
+                        $arrayCheck[] = $nameSub->category;
                         ?>
                         <tr>
                             <?php 
@@ -77,6 +79,14 @@
                     <?php
                     }
                 }
+                
+                if(!in_array($nameCat, $arrayCheck)){ ?>
+                    <tr>
+                        <td class="text-left"></td>
+                        <td>Não há candidatos selecionados</td>
+                        <td class="text-center"></td>
+                    </tr>
+                <?php }
                 ?>
             </tbody>
         </table>
