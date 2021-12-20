@@ -23,32 +23,42 @@
     </div>
     <div class="row" style="margin-top: 20px">
         <div class="container">
-            <table id="table-preliminar" width="100%" class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th class="text-center">Inscrição</th>
-                        <th class="text-center">Agente</th>
-                        <?php if($isCategory) : ?>
-                        <th class="text-center">Categoria</th>
-                        <?php endif; ?>
-                        <th class="text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($sub as $key => $value) {
-                        $agent = $app->repo('Agent')->find($value->owner->id); ?>
-                        <tr>
-                            <td class="text-center"><?php echo $value->number; ?></td>
-                            <td class="text-left"><?php echo $agent->name; ?></td>
-                            <?php if($isCategory) : ?>
-                            <td class="text-left"><?php echo $value->category !== "" ? $value->category : "Não Informado"; ?></td>
-                            <?php endif; ?>
-                            <td class="text-center"><?php echo RegistrationStatus::getStatusNameById($value->status); ?> </td>
-                        </tr>
-                    <?php } ?>
-                </tbody>
-
-            </table>
+                <?php foreach ($op->registrationCategories as $key_first => $nameCat) :?>
+                    <div class="table-info-cat" style="margin-top: 20px">
+                        <span><?php echo $nameCat; ?></span>
+                    </div>
+                    <table id="table-preliminar" width="100%" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-left" width="20%">Inscrição</th>
+                                <th class="text-left">Agente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                $arrayCheck = [];
+                                foreach ($sub as $key => $value) {
+                                    $agent = $app->repo('Agent')->find($value->owner->id); 
+                                    if($nameCat == $value->category){ 
+                                        $arrayCheck[] = $value->category; ?>
+                                <tr>
+                                    <td class="text-left"><?php echo $value->number; ?></td>
+                                    <td class="text-left"><?php echo $agent->name; ?></td>
+                                    
+                                </tr>
+                            <?php   } 
+                            } 
+                                if(!in_array($nameCat, $arrayCheck)){ ?>
+                                    <tr>
+                                        <td class="text-left"></td>
+                                        <td>Não há candidatos inscritos nessa categoria</td>
+                                        <td class="text-center"></td>
+                                    </tr>
+                                <?php }
+                            ?>
+                        </tbody>
+                    </table>
+                <?php endforeach; ?>
         </div>
     </div>
 </div>
