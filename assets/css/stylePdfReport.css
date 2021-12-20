@@ -1,5 +1,6 @@
 body {
    font-family: 'Helvetica' !important;
+
 }
 
 .title-edital {
@@ -175,10 +176,96 @@ body {
    align-items: center;
 }
 
+
+.container {
+   width: 100%;
+   padding-right: 15px;
+   padding-left: 15px;
+   margin-right: auto;
+   margin-left: auto;
+ }
+ 
+ @media (min-width: 576px) {
+   .container {
+     max-width: 540px;
+   }
+ }
+ 
+ @media (min-width: 768px) {
+   .container {
+     max-width: 720px;
+   }
+ }
+ 
+ @media (min-width: 992px) {
+   .container {
+     max-width: 960px;
+   }
+ }
+ 
+ @media (min-width: 1200px) {
+   .container {
+     max-width: 1140px;
+   }
+ }
+.pre-text {
+   padding-top: 18px;
+   margin-right: auto !important;
+   margin-left: auto !important;
+   text-align: center;
+   font-size: 19px;
+   font-weight: bold;
+}
+
+.table-info-cat {  
+   margin-bottom: 10px;
+   background: #1F4E37;
+   border: 2px solid #1F4E37 !important;
+   padding-left: 12px;
+   left: 8px;
+   color: white !important;
+   border-top-left-radius: 11px;
+   border-top-right-radius: 11px;
+   
+}
+.text-left{
+   text-align: left;
+}
+.text-center{
+   text-align: center;
+}
+
+#table-preliminar tr:nth-child(odd) td{
+   background-color:#F5F5F5;
+}
+#table-preliminar tr:nth-child(even) td{
+   background-color:#ffffff;
+}
+#table-preliminar {
+   border-collapse: collapse;
+   line-height: 30px;
+}
+#table-preliminar tr{
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
+#table-preliminar  td,th {
+   padding: .3em 1em !important;
+}
 .content-info-edital {
    display: flex;
    flex-direction: column;
    align-items: flex-start;
+}
+.text-opp{
+   color: gray !important;
+   font-family: Arial;
+   font-style: normal;
+   font-weight: bold;
+   font-size: 16px;
+   line-height: 11px;
+   display: flex;
+   align-items: center;
 }
 
 .my-registration-category {

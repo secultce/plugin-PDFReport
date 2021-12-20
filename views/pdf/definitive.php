@@ -1,58 +1,40 @@
 <?php 
-    $this->layout = 'nolayout'; 
+    $this->layout = 'nolayout-pdf'; 
     $sub = $app->view->jsObject['subscribers'];
     $nameOpportunity = $sub[0]->opportunity->name;
     $opp = $app->view->jsObject['opp'];
     $verifyResource = $this->verifyResource($this->postData['idopportunityReport']);
     $claimDisabled = $app->view->jsObject['claimDisabled'];
-   
+    include_once('header-pdf.php'); 
 ?>
-
-<div class="container">
-    <?php include_once('header.php'); ?>
+<main>
+    <div class="container">
+        <div class="pre-text">Resultado definitivo do certame</div>
+        <div class="opportunity-info">
+            <p class="text-opp">Oportunidade</p>
+            <h4 class="opp-name-relatorio"><?php echo $nameOpportunity ?></h4>
+        </div>
+    </div>
     <?php 
         //REDIRECIONA PARA OPORTUNIDADE CASO NÃO HAJA CATEGORIA        
         $type = $opp->evaluationMethodConfiguration->type->id;
         //NAO TEM RECURSO OU DESABILITADO
         if(empty($claimDisabled) || $claimDisabled == 1) {
-            // dump('dd');
-            //   dump($claimDisabled);
-            //   dump($type);
-            //   dump($opp->registrationCategories);
-            //   die;
             // nao tem categoria, tecnica e nao tem recurso 
-            if($opp->registrationCategories == "" &&  $type == 'technical'){
+            if($opp->registrationCategories == "" &&  ($type == 'technical' || $type == 'technicalna')){
+                $preliminary = false;
                 include_once('technical-no-category.php');
             }elseif($opp->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary'){
+                $preliminary = false;
                 include_once('simple-documentary-no-category.php');
-            }
-            // tem categoria, tecnica e nao tem recurso
-            if($opp->registrationCategories !== "" &&  $type == 'technical' ){
+            }elseif($opp->registrationCategories !== "" &&  $type == 'technical' || $type == 'technicalna' ){
                 $preliminary = false;
                 include_once('technical-category.php');
             }elseif($opp->registrationCategories !== "" &&  $type == 'simple' || $type == 'documentary'){
+                $preliminary = false;
                 include_once('simple-documentary-category.php');
             }
-        }else 
-        //SE TIVER RECURSO
-        if($sub[0]->canUser('sendClaimMessage')){
-           
-
-            // if($opp->registrationCategories !== "" &&  $type == 'technical'){
-            //     include_once('technical-category.php');
-            // }
-            
         }
-        
-        
-        // if($opp->registrationCategories == "" && $type == 'technical'){
-        //     include_once('defSimpleNoCat.php');
-        // }
-        // else{
-        //     include_once('defSimpleWithCat.php');
-        // }
 
     ?>
-
-</div>
-<?php include_once('footer.php'); ?>
+</main>
