@@ -27,68 +27,92 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
     <?php 
         $check = 'Não confirmado';
         $fieldValueAll = [];
+        $categories = [];
+
         foreach ($field as $fie => $fields) :
             $valueMetas = Pdf::getValueField($fields['id'], $reg->id);
-            
             $showSpan = Pdf::getDependenciesField($reg, $fields);
-           
-            if($showSpan == true): ?>
-                <span class="span-section">
-                <?php
-                    if($fields['fieldType'] === 'section') {
-                        echo "<hr><br>";
-                        echo '<u>'.$fields['title'].'</u>';
-                    }else{
-                        echo $fields['title'].': ';
-                    }
+          
+            if(!is_null($fields['categories'])) {
+                $categories = $fields['categories'];
+            }
+          
+            if($showSpan == true):
+               //CATEGORIA NAO É VAZIO E DENTRO DO ARRAY TEM O NOME DA CATEGORIA DA INSCRIÇÃO
+                if(empty($categories)) {
                 ?>
-            </span>
+                <span class="span-section">
+                    <?php
+                        if($fields['fieldType'] === 'section') {
+                            echo "<hr><br>";
+                            echo '<u>'.$fields['title'].'</u>';
+                        }else{
+                            echo $fields['title'].': ';
+                        }
+                    ?>
+                </span>
+            <?php }elseif(in_array($reg->category, $categories)) { ?>
+                <span class="span-section">
+                    <?php
+                        if($fields['fieldType'] === 'section') {
+                            echo "<hr><br>";
+                            echo '<u>'.$fields['title'].'</u>';
+                        }else{
+                            echo $fields['title'].': ';
+                        }
+                    ?>
+                </span>
+            <?php } ?>
             <span style="width: 20px; text-align: justify-all; font-size: 10px">
             <?php 
                 foreach ($valueMetas as $keyMeta => $valueMeta) {
-                    // dump($valueMeta);
-                    if($fields['fieldType'] == 'checkbox') {  
-                        if($valueMeta->value) {
-                            echo $fields['description'];
-                        }else{
-                            echo "Não informado";
+                   
+                   if($valueMeta->value !== "") {
+                        if($fields['fieldType'] == 'checkbox') {  
+                            if($valueMeta->value) {
+                                echo $fields['description'];
+                            }else{
+                                echo "Não informado";
+                            }
+                        }else if($fields['fieldType'] == 'cnpj') {
+
+                            echo Pdf::mask($valueMeta->value,'##.###.###/####-##');
+
+                        }else if($fields['fieldType'] == 'cpf') {
+                            
+                            echo Pdf::mask($valueMeta->value,'###.###.###-##');
+                        
+                        }else if($fields['fieldType'] == 'persons') {
+
+                            Pdf::showDecode($valueMeta->value, null, 'name');
+
+                        } else if ($fields['fieldType'] == 'space-field') {
+
+                            Pdf::showSpaceField($fields['config']['entityField'] , $valueMeta->value);
+
+                        } else 
+                        if($fields['fieldType'] == 'date') {
+
+                            echo date("d/m/Y", strtotime($valueMeta->value));
+
+                        }else if($fields['fieldType'] == 'links') {
+
+                            Pdf::showDecode($valueMeta->value, 'title', 'value');
+
+                        }else if($fields['fieldType'] == 'checkboxes') {
+
+                            Pdf::showItensCheckboxes($valueMeta->value);
+
+                        }else if($fields['fieldType'] == 'agent-collective-field') {
+
+                            Pdf::showAgentCollectiveField($fields['config']['entityField'], $valueMeta->value );
+                            
+                        }else if($fields['fieldType'] !== 'agent-owner-field')  {
+                            echo $valueMeta->value;
                         }
-                    }else if($fields['fieldType'] == 'cnpj') {
-
-                        echo Pdf::mask($valueMeta->value,'##.###.###/####-##');
-
-                    }else if($fields['fieldType'] == 'cpf') {
-                        
-                        echo Pdf::mask($valueMeta->value,'###.###.###-##');
-                    
-                    }else if($fields['fieldType'] == 'persons') {
-
-                        Pdf::showDecode($valueMeta->value, null, 'name');
-
-                    } else if ($fields['fieldType'] == 'space-field') {
-
-                        Pdf::showSpaceField($fields['config']['entityField'] , $valueMeta->value);
-
-                    } else 
-                    if($fields['fieldType'] == 'date') {
-
-                        echo date("d/m/Y", strtotime($valueMeta->value));
-
-                    }else if($fields['fieldType'] == 'links') {
-
-                        Pdf::showDecode($valueMeta->value, 'title', 'value');
-
-                    }else if($fields['fieldType'] == 'checkboxes') {
-
-                        Pdf::showItensCheckboxes($valueMeta->value);
-
-                    }else if($fields['fieldType'] == 'agent-collective-field') {
-
-                        Pdf::showAgentCollectiveField($fields['config']['entityField'], $valueMeta->value );
-                        
-                    }else if($fields['fieldType'] !== 'agent-owner-field')  {
-                        echo $valueMeta->value;
-                    }
+                   }else{
+                       echo 'Não informado';
+                   }
                 } 
                                 
                 if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
@@ -101,11 +125,12 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                 }
 
                 if ($fields['fieldType'] == 'file') { 
-                   
+                
                     $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
                     $id = 0;
                     $name = '';
                     if( !empty($fields['config']) ) {
+                       
                         foreach ($fields['config'] as $conf) {
                             $id   = $conf['id'];
                             $name = $conf['name'];
@@ -118,9 +143,9 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                 }
             ?>
             </span><br />
-            <?php  endif;    
+            <?php  endif;
         endforeach;
+       //die;
     ?>
 </div>
-    </main>
 

@@ -1,10 +1,9 @@
 <?php
 namespace PDFReport\Entities;
 
-use DateTime;
 use MapasCulturais\App;
-use Doctrine\ORM\Mapping as ORM;
 use MapasCulturais\RegistrationMeta;
+use DateTime;
 
 class Pdf extends \MapasCulturais\Entity{
 
@@ -36,215 +35,6 @@ class Pdf extends \MapasCulturais\Entity{
         return $maskared;
     }
 
-    static function oportunityRegistrationAproved($idopportunity, $status) {
-
-        $app = App::i();
-        $opp = $app->repo('Opportunity')->find($idopportunity);
-        
-        if($status == 10) {
-            $dql = "SELECT r
-                    FROM 
-                    MapasCulturais\Entities\Registration r
-                    WHERE r.opportunity = {$idopportunity}
-                    AND r.status = 10 ORDER BY r.consolidatedResult DESC";
-            $query = $app->em->createQuery($dql);
-            $regs = $query->getResult();
-        }else{
-            $regs = $app->repo('Registration')->findBy(
-                [
-                'opportunity' => $idopportunity
-                ]
-            );
-        }
-        
-        return ['opp' => $opp, 'regs' => $regs];
-    }
-
-    static function oportunityAllRegistration($idopportunity){
-        $app = App::i();
-        $opp = $app->repo('Opportunity')->find($idopportunity);
-
-        $regs = $app->repo('Registration')->findBy(
-            [
-            'opportunity' => $idopportunity
-            ]
-        );
-        
-        return ['opp' => $opp, 'regs' => $regs];
-    }
-
-    static function verifyResource($idOportunidade) {
-        $app = App::i();
-        $opp = $app->repo('OpportunityMeta')->findBy(['owner'=>$idOportunidade,'key'=>'claimDisabled']);
-        return $opp;
-    }
-
-    static function handleRedirect($error_message, $status_code, $opp_id){
-        $app = App::i();
-        $_SESSION['error'] = $error_message;
-        $url = $app->createUrl('oportunidade/'.$opp_id.'#/tab=inscritos');
-        $app->redirect(substr_replace($url ,"", -1), $status_code);
-    }
-
-    static function listSubscribedHandle($app, $array, $getData){
-        $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 'ALL');
-        if(empty($array['regs']['regs'])){
-            self::handleRedirect('Ops! Não tem inscrito nessa oportunidade.', 401, $getData['idopportunityReport']);
-        }
-        $array['title'] = 'Relatório de inscritos na oportunidade';
-        $array['template'] = 'pdf/subscribers';
-        return $array;
-    }
-
-    static function listPreliminaryHandle($app, $array, $getData){
-
-        $array['regs'] = self::oportunityAllRegistration($getData['idopportunityReport']);
-        
-        if(empty($array['regs']['regs'])){
-            self::handleRedirect('Ops! A oportunidade deve estar publicada.', 401, $getData['idopportunityReport']);
-        }
-
-        $verifyResource = self::verifyResource($getData['idopportunityReport']);
-
-        if(isset($verifyResource[0])){
-            $array['claimDisabled'] = $verifyResource[0]->value;
-        }
-        $array['title'] = 'Resultado Preliminar do Certame';
-        $array['template'] = 'pdf/preliminary';
-        return $array;
-    }
-
-    static function listDefinitiveHandle($app, $array, $period = false, $getData){
-        $id = $getData['idopportunityReport'];
-
-        $dqlOpMeta = "SELECT op FROM 
-            MapasCulturais\Entities\OpportunityMeta op
-            WHERE op.owner = {$id}";
-
-        $resultOpMeta = $app->em->createQuery($dqlOpMeta)->getResult();
-
-        $dateInit = $dateEnd = $hourInit = $hourEnd = "";
-
-        foreach ($resultOpMeta as $key => $valueOpMeta) {
-            if($valueOpMeta->key == 'date-initial'){
-                $dateInit = $valueOpMeta->value;
-            }
-            if($valueOpMeta->key == 'hour-initial'){
-                $hourInit = $valueOpMeta->value;
-            }
-            if($valueOpMeta->key == 'date-final'){
-                $dateEnd = $valueOpMeta->value;
-            }
-            if($valueOpMeta->key == 'hour-final'){
-                $hourEnd = $valueOpMeta->value;
-            }
-        }
-        $dateHourNow = new DateTime;
-        
-        $dateAndHourInit = $dateInit.' '.$hourInit;
-
-        $dateVerifyPeriod = DateTime::createFromFormat('d/m/Y H:i:s', $dateAndHourInit);
-
-        if($dateHourNow > $dateVerifyPeriod){
-            $period = true;
-        }
-
-        if($period) {
-            $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
-            if(empty($array['regs']['regs'])){
-                self::handleRedirect('Ops! Para gerar o relatório definitivo a oportunidade deve estar publicada.', 401, $getData['idopportunityReport']);
-            }
-            
-            //SELECT AOS RECURSOS
-            $dql = "SELECT r
-            FROM 
-            Saude\Entities\Resources r
-            WHERE r.opportunityId = {$id}";
-            $resource = $app->em->createQuery($dql)->getResult();
-            $countPublish = 0;//INICIANDO VARIAVEL COM 0
-            foreach ($resource as $key => $value) {
-                if($value->replyPublish == 1 && $value->opportunityId->publishedRegistrations == 1) {
-                    $countPublish++;//SE ENTRAR INCREMENTA A VARIAVEL
-                }
-            }
-            if($countPublish == count($resource) && $countPublish > 0 && count($resource) > 0) {
-                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
-                $array['title'] = 'Resultado Definitivo do Certame';
-                $array['template'] = 'pdf/definitive';
-               
-            }else if($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
-               
-                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
-                
-                if(empty($array['regs']['regs'])) {
-                    self::handleRedirect('Ops! Você deve publicar a oportunidade para esse relatório.', 401, $getData['idopportunityReport']);
-                }
-
-                $verifyResource = self::verifyResource($getData['idopportunityReport']);
-                
-                if(isset($verifyResource[0])){
-                    $array['claimDisabled'] = $verifyResource[0]->value;
-                }
-                
-                if(isset($regs['regs'][0]) && empty($verifyResource) || $array['claimDisabled'] == 1 ){
-                    $array['title'] = 'Resultado Definitivo do Certame';
-                    $array['template'] = 'pdf/definitive';
-                }else if(isset($regs['regs'][0]) && empty($verifyResource) || $array['claimDisabled'] == 0){
-                    $array['title'] = 'Resultado Definitivo do Certame';
-                    $array['template'] = 'pdf/definitive';
-                }else{
-                    $app->redirect($app->createUrl('oportunidade/'.$getData['idopportunityReport'].'#/tab=inscritos'), 401);
-                }
-            }else{
-                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
-                $array['title'] = 'Resultado Definitivo do Certame';
-                $array['template'] = 'pdf/definitive';
-            }
-        }else{
-            self::handleRedirect('Ops! Ocorreu um erro inesperado.', 401, $getData['idopportunityReport']);
-        }
-        return $array;
-    }
-    
-    static function listContactsHandle($app, $array, $getData){
-        $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
-
-        if(empty($regs['regs']['regs'])){
-            self::handleRedirect('', 401, $getData['idopportunityReport']);
-        }
-        $array['title'] = 'Relatório de contato';
-        $array['template'] = 'pdf/contact';
-        return $array;
-    }
-
-    static  function getSectionNote($opp, $registration, $section_id){
-        $total = 0.00;
-        $app = App::i();
-        $committee = $opp->getEvaluationCommittee();
-        $users = [];
-        foreach ($committee as $item) {
-            $users[] = $item->agent->user->id;
-        }
-        $evaluations = $app->repo('RegistrationEvaluation')->findByRegistrationAndUsersAndStatus($registration, $users);
-        foreach ($evaluations as $eval){
-            $cfg = $eval->getEvaluationMethodConfiguration();
-            $category = $eval->registration->category;
-            $totalSection = 0.00;
-            foreach ($cfg->criteria as $cri) {
-                if ($section_id == $cri->sid) {
-                    $key = $cri->id;
-                    if(!isset($eval->evaluationData->$key)){
-                        return null;
-                    } else {
-                        $val = floatval($eval->evaluationData->$key);
-                        $totalSection += is_numeric($val) ? floatval($cri->weight) * floatval($val) : 0;
-                    }
-                }
-            }
-            $total += floatval($totalSection);
-        }
-        return $total / count($users);
-    }
     static public function clearCPF_CNPJ($valor){
         $valor = trim($valor);
         $valor = str_replace(".", "", $valor);
@@ -399,12 +189,12 @@ class Pdf extends \MapasCulturais\Entity{
     }
 
     static public function getDependenciesField($registration, $fields) {
-      
+       
         $app = App::i();
         $show = true;
         $fieldRegMeta = '';
         $valueRegMeta = '';
-
+        //dump($fields);
         if($fields['fieldType'] !== 'file'){
             if(is_array($fields['config'])) {    
                 foreach ($fields['config'] as $keyConf => $valConf) {
@@ -425,7 +215,7 @@ class Pdf extends \MapasCulturais\Entity{
                     $show = false;
                 }
             }
-        }
+        }     
         
        return $show;
     }
@@ -452,10 +242,10 @@ class Pdf extends \MapasCulturais\Entity{
     
     static public function showAllFieldAndFile($registration) {
         $fields = []; // array vazio
-
+        //dump($registration->category);
         $registrationOpportunity = $registration->opportunity;
         foreach ($registrationOpportunity->registrationFieldConfigurations as $field) {
-            //ATRIBUINDO ARRAY DOS CAMPOS AO ARRAY
+           //dump( 'oi' ,$field->categories);
             array_push($fields , [
                 'displayOrder' => $field->displayOrder,
                 'id' => $field->id,
@@ -463,47 +253,56 @@ class Pdf extends \MapasCulturais\Entity{
                 'description' => $field->description,
                 'fieldType' => $field->fieldType,
                 'config' => $field->config,
-                'owner' => $field->owner                        
+                'owner' => $field->owner,
+                'categories' => $field->categories
             ]);
+           
         }
         //VERIFICANDO DE TEM ARQUVIOS
         if($registrationOpportunity->registrationFileConfigurations->count() > 0) {
             
             foreach ($registrationOpportunity->registrationFileConfigurations as $key => $file) {
                 $fileRegistration = self::getFileRegistration($registration, $file->fileGroupName);
-                
                 $registrationFile = (array) $fileRegistration;
                 $config = [];
-                //
-                if($file->multiple) {
-                    foreach ($registrationFile as $key => $fileValue) {                       
-                        array_push($config, [
-                            'id'    => $fileValue->id,
-                            'group' => $fileValue->group,
-                            'name'  => $fileValue->name,
-                            'owner' => $fileValue->owner
-                        ]);
+                
+                //EM SITUAÇÃO QUE A CATEGORIA DO ARQUIVO É DIFERENTE DA SELICIONAD NA INSCRIÇÃO
+                //VAI TER O RETORNO NULL, ENTÃO NÃO ENTRA NO IF PARA MONTRAR O ARRAY
+                if(!is_null($fileRegistration)) {
+                    if($file->multiple) {
+                        foreach ($registrationFile as $key => $fileValue) {                       
+                            array_push($config, [
+                                'id'    => $fileValue->id,
+                                'group' => $fileValue->group,
+                                'name'  => $fileValue->name,
+                                'owner' => $fileValue->owner
+                            ]);
+                        }
+                    }else {
+                        foreach ($registrationFile as $key => $conf) {
+                            array_push($config, [
+                                'id'    => $conf->id,
+                                'group' => $conf->group,
+                                'name'  => $conf->name,
+                                'owner' => $conf->owner
+                            ]);
+                        }
                     }
-                }else {
-                    foreach ($registrationFile as $key => $conf) {
-                        array_push($config, [
-                            'id'    => $conf->id,
-                            'group' => $conf->group,
-                            'name'  => $conf->name,
-                            'owner' => $conf->owner
-                        ]);
-                    }
+                   
+                    array_push($fields , [
+                        'displayOrder' => $file->displayOrder,
+                        'id' => $file->id,
+                        'title' => $file->title,
+                        'description' => $file->description,
+                        'fieldType' => 'file',
+                        'config' => $config,
+                        'owner' => $file->owner,
+                        'multiple' => $file->multiple,
+                        'categories' => $file->categories    
+                    ]);
+                    
                 }
-                array_push($fields , [
-                    'displayOrder' => $file->displayOrder,
-                    'id' => $file->id,
-                    'title' => $file->title,
-                    'description' => $file->description,
-                    'fieldType' => 'file',
-                    'config' => $config,
-                    'owner' => $file->owner,
-                    'multiple' => $file->multiple     
-                ]);
+                
             }
         }
         $column_order = array_column( $fields, 'displayOrder' );
