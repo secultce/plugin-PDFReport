@@ -24,7 +24,7 @@
     <div class="row" style="margin-top: 20px">
         <div class="container">
                 <?php foreach ($op->registrationCategories as $key_first => $nameCat) :?>
-                    <div class="table-info-cat" style="margin-top: 20px">
+                    <div class="table-info-cat" style="margin-top: 10px">
                         <span><?php echo $nameCat; ?></span>
                     </div>
                     <table id="table-preliminar" width="100%" class="table table-striped table-bordered">

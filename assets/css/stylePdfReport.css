@@ -28,6 +28,7 @@ body {
 
 .text-center {
    text-align: center;
+   font-size: 8px;
 }
 
 .fontArial {
@@ -226,31 +227,30 @@ body {
    color: white !important;
    border-top-left-radius: 11px;
    border-top-right-radius: 11px;
-   
+   font-size: 12px;
 }
 .text-left{
    text-align: left;
+   font-size: 10px;
 }
 .text-center{
    text-align: center;
+   font-size: 10px;
 }
 
 #table-preliminar tr:nth-child(odd) td{
-   background-color:#F5F5F5;
+   background-color:#c2bebe;
 }
 #table-preliminar tr:nth-child(even) td{
    background-color:#ffffff;
 }
 #table-preliminar {
    border-collapse: collapse;
-   line-height: 30px;
+   line-height: 20px;
 }
 #table-preliminar tr{
    margin-top: 10px;
    margin-bottom: 10px;
-}
-#table-preliminar  td,th {
-   padding: .3em 1em !important;
 }
 .content-info-edital {
    display: flex;
