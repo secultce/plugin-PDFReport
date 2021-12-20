@@ -31,7 +31,7 @@
                         <thead>
                             <tr>
                                 <th class="text-left" width="20%">Inscrição</th>
-                                <th class="text-left">Agente</th>
+                                <th class="text-left">Candidatos</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,7 +51,7 @@
                                 if(!in_array($nameCat, $arrayCheck)){ ?>
                                     <tr>
                                         <td class="text-left"></td>
-                                        <td>Não há candidatos inscritos nessa categoria</td>
+                                        <td class="text-left">Não há candidatos inscritos nessa categoria</td>
                                         <td class="text-center"></td>
                                     </tr>
                                 <?php }

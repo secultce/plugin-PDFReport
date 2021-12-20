@@ -46,6 +46,7 @@ class Pdf extends \MapasCulturais\Controller{
         $app->view->jsObject['title'] = $array['title'];
 
         $content = $app->view->fetch($array['template']);
+
         $mpdf->SetDisplayMode('fullpage');
         $mpdf->SetTitle('Mapa da Saúde - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
