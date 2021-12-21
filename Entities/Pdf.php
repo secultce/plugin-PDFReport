@@ -310,54 +310,57 @@ class Pdf extends \MapasCulturais\Entity{
     }
     
     static public function showAgenteOwnerField($field, $metaData, $owner) {
-        
+        $valueField = null;
         if ($field == '@location') {
             if(!is_null($owner['En_Complemento'])) {
-                print_r("CEP: ".$owner['En_CEP'].', 
+                $valueField = "CEP: ".$owner['En_CEP'].', 
                 Logradouro: '.$owner['En_Nome_Logradouro'].', 
                 Nº: '.$owner['En_Num'].', Comp: '.$owner['En_Complemento'].', 
                 Bairro: '.$owner['En_Bairro'].', 
                 Cidade: '.$owner['En_Municipio'].', 
-                UF: '.$owner['En_Estado']);
+                UF: '.$owner['En_Estado'];
+                
             }else{
-                print_r("CEP: ".$owner['En_CEP'].', 
+                $valueField = "CEP: ".$owner['En_CEP'].', 
                 Logradouro: '.$owner['En_Nome_Logradouro'].', 
                 Nº: '.$owner['En_Num'].', 
                 Bairro: '.$owner['En_Bairro'].', 
                 Cidade: '.$owner['En_Municipio'].', 
-                UF: '.$owner['En_Estado']);
+                UF: '.$owner['En_Estado'];              
             }
             
-        }else
-        if( $field == '@terms:area' ||
+        }elseif( $field == '@terms:area' ||
             $field == 'longDescription'){
-            echo trim(preg_replace('/\PL/u', ' ', $metaData));          
+            $valueField = trim(preg_replace('/\PL/u', ' ', $metaData));
         }elseif($field == 'name' || $field == 'nomeCompleto' || $field == 'shortDescription' ||
                 $field == "genero" || $field == 'telefone1' || $field == 'telefone2' || $field == 'emailPrivado' || $field == 'emailPublico') {
-
-           echo $owner[$field];
+                
+                $valueField = $owner[$field];
 
         }elseif($field == "facebook" || $field == "intagram" || 
                 $field == "twitter" || $field == "site" || 
                 $field == "googleplus"){
-            echo str_replace(array('\\', '"'), '', $metaData); 
-
+                $valueField = str_replace(array('\\', '"'), '', $metaData);
         }
         elseif( $field == 'dataDeNascimento') {
             
             $date = DateTime::createFromFormat('Y-m-d', $owner['dataDeNascimento']);
-            echo $date->format('d/m/Y');
+            $valueField = $date->format('d/m/Y');
 
         }elseif($field == 'documento') { // PARA FORMATAR CPF OU CNPJ
             $doc =  self::clearCPF_CNPJ($owner[$field]); // retirando formatação caso venha
             $str = strlen($doc); // total de carecteres
             if($str == 11) {
-                echo self::mask($doc,'###.###.###-##');
+                $valueField = self::mask($doc,'###.###.###-##');
             }else{
-                echo self::mask($doc,'##.###.###/####-##');
+                $valueField = self::mask($doc,'##.###.###/####-##');
             }
         }
-
+        if(!is_null($valueField)) {
+            echo $valueField;
+        }else{
+            echo '<span class="my-reg-font-10">Não informado</span>';
+        }
     }
 
 

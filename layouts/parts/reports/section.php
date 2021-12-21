@@ -28,6 +28,7 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
         $check = 'Não confirmado';
         $fieldValueAll = [];
         $categories = [];
+        $isCategory = false;
 
         foreach ($field as $fie => $fields) :
             $valueMetas = Pdf::getValueField($fields['id'], $reg->id);
@@ -38,36 +39,42 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
             }
           
             if($showSpan == true):
-               //CATEGORIA NAO É VAZIO E DENTRO DO ARRAY TEM O NOME DA CATEGORIA DA INSCRIÇÃO
+               //SE CATEGORIA FOR VAZIO, MOSTRA O NOME DOS CAMPOS
                 if(empty($categories)) {
                 ?>
                 <span class="span-section">
                     <?php
                         if($fields['fieldType'] === 'section') {
                             echo "<hr><br>";
-                            echo '<u>'.$fields['title'].'</u>';
+                            echo '<u>'.$fields['title'].'</u><br />';
                         }else{
                             echo $fields['title'].': ';
                         }
                     ?>
                 </span>
-            <?php }elseif(in_array($reg->category, $categories)) { ?>
+            <?php 
+                //SE TIVER CATEGORIA E FOR IGUAL A CATEGORIA DA INSCRIÇÃO, MOSTRA O CAMPO
+                }elseif(in_array($reg->category, $categories)) {
+                    $isCategory = true; 
+                ?>
                 <span class="span-section">
                     <?php
                         if($fields['fieldType'] === 'section') {
                             echo "<hr><br>";
-                            echo '<u>'.$fields['title'].'</u>';
+                            echo '<u>'.$fields['title'].'</u><br />';
                         }else{
                             echo $fields['title'].': ';
                         }
                     ?>
                 </span>
-            <?php } ?>
-            <span style="width: 20px; text-align: justify-all; font-size: 10px">
-            <?php 
+            <?php } 
+               $iniSpan = '<span class="my-registration-value-span">';
+               $endSpan = '</span><br />';
                 foreach ($valueMetas as $keyMeta => $valueMeta) {
-                   
-                   if($valueMeta->value !== "") {
+                  
+                   if($fields['fieldType'] !== "agent-owner-field") {
+                    echo $iniSpan;
+                       //dump('value' , $valueMeta->value, $fields['fieldType']);
                         if($fields['fieldType'] == 'checkbox') {  
                             if($valueMeta->value) {
                                 echo $fields['description'];
@@ -86,13 +93,12 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
 
                             Pdf::showDecode($valueMeta->value, null, 'name');
 
-                        } else if ($fields['fieldType'] == 'space-field') {
+                        }else if ($fields['fieldType'] == 'space-field') {
 
                             Pdf::showSpaceField($fields['config']['entityField'] , $valueMeta->value);
 
-                        } else 
-                        if($fields['fieldType'] == 'date') {
-
+                        }else if($fields['fieldType'] == 'date') {
+                            echo 'aqui';
                             echo date("d/m/Y", strtotime($valueMeta->value));
 
                         }else if($fields['fieldType'] == 'links') {
@@ -107,43 +113,44 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
 
                             Pdf::showAgentCollectiveField($fields['config']['entityField'], $valueMeta->value );
                             
-                        }else if($fields['fieldType'] !== 'agent-owner-field')  {
+                        }else if($valueMeta->value !== "") {
                             echo $valueMeta->value;
+                        }else{
+                            echo '<span class="my-reg-font-10">Não informado</span>';
                         }
-                   }else{
-                       echo 'Não informado';
+                        echo $endSpan;
                    }
+                   
                 } 
                                 
                 if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
+                    echo $iniSpan;
                     $meta = null;
                     
                     if(isset($valueMeta) && $valueMeta->value !== "" && isset($valueMeta->value)) {
                         $meta = $valueMeta->value;
                     }
                     Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
+                    echo $endSpan;
                 }
 
                 if ($fields['fieldType'] == 'file') { 
-                
-                    $controllerId = $app->getControllerIdByEntity("MapasCulturais\Entities\File");
-                    $id = 0;
-                    $name = '';
-                    if( !empty($fields['config']) ) {
+                    
+                    if(empty($categories)) {
                        
-                        foreach ($fields['config'] as $conf) {
-                            $id   = $conf['id'];
-                            $name = $conf['name'];
-                            $url = $app->createUrl($controllerId, 'privateFile', [$id]);
-                            echo '<br /><a href="'.$url.'"> '.$name.'</a>';
-                        }
-                    }else{
-                        echo 'Arquivo não enviado.';
-                    };
+                        require 'content-file.php';
+                       
+                    }elseif(in_array($reg->category, $categories)) {
+                       
+                        require 'content-file.php';
+                      
+                    }
                 }
             ?>
-            </span><br />
-            <?php  endif;
+            
+            <?php  
+           
+            endif; //ENDIF showSpan
         endforeach;
        //die;
     ?>
