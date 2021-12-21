@@ -1,89 +1,93 @@
 <?php 
-    $this->layout = 'nolayout'; 
+    use MapasCulturais\App;
+    use Saude\Utils\RegistrationStatus;
+    use PDFReport\Entities\Pdf;
+
+    $this->layout = 'nolayout-pdf'; 
     $sub = $app->view->jsObject['subscribers'];
     $nameOpportunity = $sub[0]->opportunity->name;
     $opp = $app->view->jsObject['opp'];
+    $sections = $opp->evaluationMethodConfiguration->sections;
+    $criterios = $opp->evaluationMethodConfiguration->criteria;
+
+    function invenDescSort($item1,$item2){
+        if ($item1->consolidatedResult == $item2->consolidatedResult) return 0;
+        return ($item1->consolidatedResult < $item2->consolidatedResult) ? 1 : -1;
+    }
+    usort($sub,'invenDescSort');
+    
+  
 ?>
 <div class="container">
     <?php 
-    foreach ($opp->registrationCategories as $key => $nameCat) :?>
-        <table class="table table-striped table-bordered">
+    foreach ($opp->registrationCategories as $key_first => $nameCat) :?>
+        <div class="table-info-cat">
+            <span><?php echo $nameCat; ?></span>
+        </div>
+        <table id="table-preliminar" width="100%">
             <thead>
-                <tr class="activeTr">
-                    <th colspan="4" style="border: 1px solid #716e6e;">
-                        <label class="th-right">
-                            <?php echo $nameCat; ?>
-                        </label>
-                    </th>
-                    
-                </tr>
-                <tr style="background-color: #009353; color:black">
-                    <th style="width: 10%;" class="text-center">Classificação</th>
-                    <th class="space-tbody-15 td-classificacao" style="width: 20%;">Inscrição</th>
-                    <th class="td-classificacao" style="width: 50%;">Nome</th>
+                <tr style="border: 1px solid #CFDCE5;">
                     <?php 
-                    if($preliminary) :
+                        if(isset($preliminary)){
+                            echo '<th class="text-left" width="10%">Classificação</th>';
+                        }
                     ?>
-                    <th class="text-center space-tbody-10 td-classificacao" style="width: 10%;">Nota</th>
+                    <th class="text-left" style="margin-top: 5px;" width="22%">Inscrição</th>
+                    <th class="text-left" width="68%">Candidatos</th>
                     <?php 
-                    endif;
-                    
-                    if($preliminary == false) :
-                    ?>
-                    <th class="text-center space-tbody-10 td-classificacao" style="width: 10%;">Nota Def.</th>
-                    <?php 
-                    endif;
+                        if(isset($preliminary)){
+                            echo '<th class="text-center" width="10%">NF</th>' ;
+                        }else{
+                            foreach($sections as $key => $sec){
+                                if(in_array($nameCat, $sec->categories)){ ?>
+                                    <th class="text-center" width="<?php echo count($sections) > 1 ? "5%" : "10%" ?>"><?php echo 'N'.($key + 1).'E' ?></th>
+                        <?php   }
+                            }
+                        }
                     ?>
                 </tr>
             </thead>
             <tbody>
-            <?php 
-                $isExist = false;
-                $classification = 0;
-                //LOOP NOS CANDIDATOS
-                foreach ($sub as $key => $nameSub):
-                    //SE AS CATEGORIAS FOREM IGUAIS, IMPRIME AS INFORMAÇÕES
-                    if($nameCat == $nameSub->category):?>
-                    <tr>
-                        <td class="text-center td-classificacao">
-                        <?php 
-                        //A CADA LOOP A CLASSIFICAÇÃO RECEBE, ELE MESMO +1
-                            $classification = ($classification + 1);
-                            echo $classification;
+                <?php 
+                $countArray = [];
+                $arrayCheck = [];
+                foreach($sub as $key => $nameSub){
+                    if($nameCat == $nameSub->category){
+                        $countArray[$nameCat][] = $key;
+                        $arrayCheck[] = $nameSub->category;
                         ?>
-                        <td class="space-tbody-15 td-classificacao"><?php echo $nameSub->number; ?></td>
-                        <td class="td-classificacao"><?php echo $nameSub->owner->name; ?></td>
-                        <td class="text-center space-tbody-10 td-classificacao">
+                        <tr>
                             <?php 
-                                if($preliminary){
-                                    echo $nameSub->preliminaryResult;
-                                }else{
-                                    echo $nameSub->consolidatedResult;
-                                }; 
+                                if(isset($preliminary)){ ?>
+                                    <td class="text-center"><?php echo count($countArray[$nameCat]) ?> </td>
+                                <?php }
                             ?>
-                        </td>
+                            <td class="text-left"><?php echo $nameSub->number; ?></td>
+                            <td class="text-left"><?php echo $nameSub->owner->name; ?></td>
+                            <?php 
+                                if(isset($preliminary)){ ?>
+                                    <td class="text-center"><?php echo $nameSub->consolidatedResult; ?></td>
+                                <?php } else{
+                                    foreach($sections as $key => $sec){ 
+                                        if(in_array($nameSub->category, $sec->categories)){ ?>
+                                            <td class="text-center"><?php echo Pdf::getSectionNote($opp, $nameSub, $sec->id); ?></td>
+                            <?php       } 
+                                    }
+                                }
+                            ?>
+                        </tr>
+                    <?php
+                    }
+                }
+                
+                if(!in_array($nameCat, $arrayCheck)){ ?>
+                    <tr class="no-subs">
+                        <td width="10%"></td>
+                        <td class="text-left">Não há candidatos selecionados</td>
                     </tr>
-                <?php
-                //EXCLUINDO O INDICE DO ARRAY PARA O PROXIMO LOOP
-                unset($sub[$key]);
-                    endif;
-                    //SE NÃO EXISTIR REGISTRO NO INDICE DO ARRAY ENTÃO ALTERA PARA TRUE
-                    if(!isset($nameSub->id)):
-                        $isExist = true;
-                    endif;
-                endforeach;
-                //SE FOR FALSO - IMPRIME A INFORMAÇÃO
-                if(!$isExist) :?>
-                    <tr>
-                        <td colspan="4"><?php \MapasCulturais\i::_e("Não houve candidato selecionado nessa categoria");?></td>
-                    </tr>
-            <?php    
-                endif;
-            ?>
+                <?php }
+                ?>
             </tbody>
         </table>
     <?php endforeach; ?>
 </div>
-<?php 
-    //die;
-?>

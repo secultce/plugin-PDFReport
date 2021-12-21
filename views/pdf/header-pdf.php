@@ -17,15 +17,6 @@
 
 </head>
 <body>
-<?php if(isset($_GET['idopportunityReport']) && $_GET['idopportunityReport'] > 0) : ?>
-<div class="container">
-    <br>
-    <a href="#" class="btn btn-primary" id="btn-print-report" >
-        <i class="fa fa-print"></i>
-        Imprimir Relatório
-    </a>
-</div>
-<?php endif; ?>
 <table width="100%" style="height: 100px;">
     <thead>
         <tr class="">
@@ -33,7 +24,7 @@
                 <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/logo-saude.png'; ?>" style="float:left;"/>
             </td>
             <td>
-            <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png'; ?>" style="margin-left: 300px;" alt="">
+            <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png'; ?>" style="margin-left: 380px;" alt="">
             </td>
         </tr>
     </thead>
