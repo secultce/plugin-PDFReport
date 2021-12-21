@@ -219,7 +219,8 @@ body {
 }
 
 .table-info-cat {  
-   margin-bottom: 10px;
+   margin-bottom: 5px;
+   margin-top: 5px;
    background: #1F4E37;
    border: 2px solid #1F4E37 !important;
    padding-left: 12px;
@@ -239,10 +240,10 @@ body {
 }
 
 #table-preliminar tr:nth-child(odd) td{
-   background-color:#c2bebe;
+   background-color:#ffffff;
 }
 #table-preliminar tr:nth-child(even) td{
-   background-color:#ffffff;
+   background-color:#c2bebe;
 }
 #table-preliminar {
    border-collapse: collapse;
@@ -274,4 +275,7 @@ body {
    width: 100%; 
    padding: 8px;
    margin-bottom: 10px;
+}
+.no-subs{
+   border-bottom: solid #c2bebe 1px;
 }

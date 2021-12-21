@@ -29,11 +29,11 @@
                 <tr style="border: 1px solid #CFDCE5;">
                     <?php 
                         if(isset($preliminary)){
-                            echo '<th class="text-center" width="25%">Classificação</th>';
+                            echo '<th class="text-left" width="10%">Classificação</th>';
                         }
                     ?>
-                    <th class="text-left" style="margin-top: 5px;" width="10%">Inscrição</th>
-                    <th class="text-left" width="60%">Candidatos</th>
+                    <th class="text-left" style="margin-top: 5px;" width="22%">Inscrição</th>
+                    <th class="text-left" width="68%">Candidatos</th>
                     <?php 
                         if(isset($preliminary)){
                             echo '<th class="text-center" width="10%">NF</th>' ;
@@ -81,21 +81,9 @@
                 }
                 
                 if(!in_array($nameCat, $arrayCheck)){ ?>
-                    <tr>
-                        <?php if(isset($preliminary)){ ?>
-                            <td class="text-center"></td>
-                        <?php } ?>
-                        <td class="text-left"></td>
+                    <tr class="no-subs">
+                        <td width="10%"></td>
                         <td class="text-left">Não há candidatos selecionados</td>
-                        <?php if(!isset($preliminary)) { 
-                            foreach($sections as $key => $sec){ 
-                                if(in_array($nameSub->category, $sec->categories)){?>
-                                    <td class="text-center"></td>
-                        <?php   } 
-                            }
-                        } else{ 
-                            echo "<td class='text-center'></td>";
-                        }?>
                     </tr>
                 <?php }
                 ?>
