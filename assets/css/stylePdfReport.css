@@ -279,3 +279,12 @@ body {
 .no-subs{
    border-bottom: solid #c2bebe 1px;
 }
+.my-reg-font-10 {
+   font-size: 10px
+}
+.my-registration-value-span {
+   width: 20px; 
+   text-align: justify-all;
+   font-size: 10px;
+
+}
