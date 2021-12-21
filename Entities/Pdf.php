@@ -50,13 +50,15 @@ class Pdf extends \MapasCulturais\Entity{
             $query = $app->em->createQuery($dql);
             $regs = $query->getResult();
         }else{
+           
             $regs = $app->repo('Registration')->findBy(
                 [
                 'opportunity' => $idopportunity
                 ]
             );
+           
         }
-        
+       
         return ['opp' => $opp, 'regs' => $regs];
     }
 
@@ -243,7 +245,10 @@ class Pdf extends \MapasCulturais\Entity{
             }
             $total += floatval($totalSection);
         }
-        return $total / count($users);
+        if(count($users) > 0) {
+            return $total / count($users);
+        }
+        
     }
     static public function clearCPF_CNPJ($valor){
         $valor = trim($valor);
@@ -463,7 +468,8 @@ class Pdf extends \MapasCulturais\Entity{
                 'description' => $field->description,
                 'fieldType' => $field->fieldType,
                 'config' => $field->config,
-                'owner' => $field->owner                        
+                'owner' => $field->owner,
+                'categories' => $field->categories                        
             ]);
         }
         //VERIFICANDO DE TEM ARQUVIOS
@@ -502,7 +508,8 @@ class Pdf extends \MapasCulturais\Entity{
                     'fieldType' => 'file',
                     'config' => $config,
                     'owner' => $file->owner,
-                    'multiple' => $file->multiple     
+                    'multiple' => $file->multiple,
+                    'categories' => $file->categories     
                 ]);
             }
         }
@@ -512,4 +519,3 @@ class Pdf extends \MapasCulturais\Entity{
         return $fields;
     }
 }
-
