@@ -22,6 +22,11 @@ class Pdf extends \MapasCulturais\Controller{
     function GET_gerarPdf() {
         $app = App::i();
 
+        
+        if($app->user->is('guest')){
+            $app->auth->requireAuthentication();
+        }
+
         $array = [
             'regs' => '',
             'title' => '',
