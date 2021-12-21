@@ -82,9 +82,20 @@
                 
                 if(!in_array($nameCat, $arrayCheck)){ ?>
                     <tr>
+                        <?php if(isset($preliminary)){ ?>
+                            <td class="text-center"></td>
+                        <?php } ?>
                         <td class="text-left"></td>
-                        <td>Não há candidatos selecionados</td>
-                        <td class="text-center"></td>
+                        <td class="text-left">Não há candidatos selecionados</td>
+                        <?php if(!isset($preliminary)) { 
+                            foreach($sections as $key => $sec){ 
+                                if(in_array($nameSub->category, $sec->categories)){?>
+                                    <td class="text-center"></td>
+                        <?php   } 
+                            }
+                        } else{ 
+                            echo "<td class='text-center'></td>";
+                        }?>
                     </tr>
                 <?php }
                 ?>
