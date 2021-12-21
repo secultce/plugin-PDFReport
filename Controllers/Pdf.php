@@ -34,24 +34,43 @@ class Pdf extends \MapasCulturais\Controller{
             'template' => '',
             'claimDisabled' => null,
             'pluginConf' => ['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8',
-            'format' => 'A4']
+            'format' => 'A4',
+            'pagenumPrefix' => 'Página ',
+            'pagenumSuffix' => '  ',
+            'nbpgPrefix' => ' de ',
+            'nbpgSuffix' => ''
+            ]
         ];
+        // dump($this->getData['selectRel']);
         if($this->getData['selectRel'] == NO_SELECTION) EntitiesPdf::handleRedirect('Ops! Selecione uma opção', 401, $this->getData['idopportunityReport']);
         else if($this->getData['selectRel'] == LIST_SUBSCRIBED) $array = EntitiesPdf::listSubscribedHandle($app, $array, $this->getData);
         else if($this->getData['selectRel'] == LIST_PRELIMINARY) $array = EntitiesPdf::listPreliminaryHandle($app, $array, $this->getData);
         else if($this->getData['selectRel'] == LIST_DEFINITIVE) $array = EntitiesPdf::listDefinitiveHandle($app, $array, false, $this->getData);
         else if($this->getData['selectRel'] == LIST_CONTACTS) $array = EntitiesPdf::listContactsHandle($app, $array, $this->getData);
         else $app->redirect($app->createUrl('oportunidade/'.$this->getData['idopportunityReport']), 401);
-
+        // dump($array);
         $mpdf = new Mpdf($array['pluginConf']);
         ob_start();
         
         $app->view->jsObject['subscribers'] = $array['regs']['regs'];
+        // dump($app->view->jsObject['subscribers']);
+        // die;
         $app->view->jsObject['opp'] = $array['regs']['opp'];
         $app->view->jsObject['claimDisabled'] = $array['claimDisabled'];
         $app->view->jsObject['title'] = $array['title'];
-
+        
         $content = $app->view->fetch($array['template']);
+        $footer = '<div style="border-top: 1px solid #c5c5c5;">
+        <div style="width: 100%; float: left;"><p style="text-align: center; font-size: 10px;"><span>Escola de Saúde Pública do Ceará Paulo Marcelo Martins Rodrigues</span></p>
+        <p style="text-align: center; font-size: 10px;"><span>Av. Antônio Justa, 3161 - Meireles - CEP: 60.165-090</span></p>
+        <p style="text-align: center; font-size: 10px;"><span>Fortaleza / CE - Fone: (85) 3101.1398</span></p></div>
+        </div>
+        <div style="width: 100%; float: left;"><p style="text-align: center; padding-right 30px; font-size: 10px;"><span> {PAGENO}{nbpg}</span></p></div>';
+                
+        $mpdf->SetHTMLFooter($footer);
+        $mpdf->SetHTMLFooter($footer, 'E');
+        $mpdf->writingHTMLfooter = true;
+
         $mpdf->SetDisplayMode('fullpage');
         $mpdf->SetTitle('Mapa da Saúde - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH.'PDFReport/assets/css/stylePdfReport.css');
@@ -60,9 +79,9 @@ class Pdf extends \MapasCulturais\Controller{
                 5, // margin_left
                 5, // margin right
                 10, // margin top
-                0, // margin bottom
+                20, // margin bottom
                 0, // margin header
-                0
+                3
             ); // margin footer
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($content,2);
