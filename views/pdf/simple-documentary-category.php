@@ -41,7 +41,7 @@
                 if(!in_array($nameCat, $arrayCheck)){ ?>
                     <tr>
                         <td class="text-left"></td>
-                        <td>Não há candidatos selecionados</td>
+                        <td class="text-left">Não há candidatos selecionados</td>
                         <td class="text-center"></td>
                     </tr>
                 <?php }
