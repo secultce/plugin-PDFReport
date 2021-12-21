@@ -97,7 +97,12 @@ class Pdf extends \MapasCulturais\Controller{
             $app->auth->requireAuthentication();
         }
 
-        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 'utf-8','format' => 'A4']);
+        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 
+                        'utf-8','format' => 'A4',
+                        'pagenumPrefix' => 'Página ',
+                        'pagenumSuffix' => '  ',
+                        'nbpgPrefix' => ' de ',
+                        'nbpgSuffix' => '']);
         
         $reg = $app->repo('Registration')->find($this->data['id']);
 
