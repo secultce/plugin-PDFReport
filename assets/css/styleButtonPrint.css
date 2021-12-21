@@ -1,0 +1,5 @@
+.registration-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+ }
