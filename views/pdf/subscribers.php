@@ -47,7 +47,7 @@
                                         $arrayCheck[] = $value->category; ?>
                                 <tr>
                                     <td class="text-left"><?php echo $value->number; ?></td>
-                                    <td class="text-left"><?php echo $agent->name; ?></td>
+                                    <td class="text-left"><?php echo strtoupper($agent->name); ?></td>
                                     
                                 </tr>
                             <?php   } 

@@ -36,28 +36,28 @@ class Pdf extends \MapasCulturais\Entity{
         return $maskared;
     }
 
-    static function oportunityRegistrationAproved($idopportunity, $status) {
-
+    static function oportunityRegistrationByStatus($idopportunity, $status = 0) {
         $app = App::i();
         $opp = $app->repo('Opportunity')->find($idopportunity);
         
-        if($status == 10) {
-            $dql = "SELECT r
-                    FROM 
-                    MapasCulturais\Entities\Registration r
-                    WHERE r.opportunity = {$idopportunity}
-                    AND r.status = 10 ORDER BY r.consolidatedResult DESC";
-            $query = $app->em->createQuery($dql);
-            $regs = $query->getResult();
-        }else{
-           
-            $regs = $app->repo('Registration')->findBy(
-                [
-                'opportunity' => $idopportunity
-                ]
-            );
-           
+        $where = "";
+        if ($status) {
+            $where .= " AND r.status = :status ";
+        } else {
+            $where .= " AND r.status > :status ";
         }
+
+        $dql = "SELECT r
+                FROM 
+                MapasCulturais\Entities\Registration r
+                WHERE r.opportunity = :opportunity
+                {$where}
+                ORDER BY r.consolidatedResult DESC";
+        $query = $app->em->createQuery($dql);
+        $query->setParameter('opportunity', $idopportunity);
+
+        $query->setParameter('status', $status);
+        $regs = $query->getResult();
        
         return ['opp' => $opp, 'regs' => $regs];
     }
@@ -89,7 +89,7 @@ class Pdf extends \MapasCulturais\Entity{
     }
 
     static function listSubscribedHandle($app, $array, $getData){
-        $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 'ALL');
+        $array['regs'] = self::oportunityRegistrationByStatus($getData['idopportunityReport']);
         if(empty($array['regs']['regs'])){
             self::handleRedirect('Ops! Não tem inscrito nessa oportunidade.', 401, $getData['idopportunityReport']);
         }
@@ -100,7 +100,7 @@ class Pdf extends \MapasCulturais\Entity{
 
     static function listPreliminaryHandle($app, $array, $getData){
 
-        $array['regs'] = self::oportunityAllRegistration($getData['idopportunityReport']);
+        $array['regs'] = self::oportunityRegistrationByStatus($getData['idopportunityReport']);
         
         if(empty($array['regs']['regs'])){
             self::handleRedirect('Ops! A oportunidade deve estar publicada.', 401, $getData['idopportunityReport']);
@@ -121,9 +121,12 @@ class Pdf extends \MapasCulturais\Entity{
 
         $dqlOpMeta = "SELECT op FROM 
             MapasCulturais\Entities\OpportunityMeta op
-            WHERE op.owner = {$id}";
+            WHERE op.owner = :owner";
 
-        $resultOpMeta = $app->em->createQuery($dqlOpMeta)->getResult();
+        $query = $app->em->createQuery($dqlOpMeta);
+        $query->setParameter('owner', $id);
+
+        $resultOpMeta = $query->getResult();
 
         $dateInit = $dateEnd = $hourInit = $hourEnd = "";
 
@@ -152,17 +155,21 @@ class Pdf extends \MapasCulturais\Entity{
         }
 
         if($period) {
-            $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
+            $array['regs'] = self::oportunityRegistrationByStatus($getData['idopportunityReport'], 10);
             if(empty($array['regs']['regs'])){
                 self::handleRedirect('Ops! Para gerar o relatório definitivo a oportunidade deve estar publicada.', 401, $getData['idopportunityReport']);
             }
             
             //SELECT AOS RECURSOS
             $dql = "SELECT r
-            FROM 
-            Saude\Entities\Resources r
-            WHERE r.opportunityId = {$id}";
-            $resource = $app->em->createQuery($dql)->getResult();
+                FROM 
+                Saude\Entities\Resources r
+                WHERE r.opportunityId = :opportunity";
+            $query = $app->em->createQuery($dql);
+            $query->setParameter('opportunity', $id);
+
+            $resource = $query->getResult();
+
             $countPublish = 0;//INICIANDO VARIAVEL COM 0
             foreach ($resource as $key => $value) {
                 if($value->replyPublish == 1 && $value->opportunityId->publishedRegistrations == 1) {
@@ -170,13 +177,13 @@ class Pdf extends \MapasCulturais\Entity{
                 }
             }
             if($countPublish == count($resource) && $countPublish > 0 && count($resource) > 0) {
-                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
+                $array['regs'] = self::oportunityRegistrationByStatus($getData['idopportunityReport'], 10);
                 $array['title'] = 'Resultado Definitivo do Certame';
                 $array['template'] = 'pdf/definitive';
                
             }else if($countPublish == count($resource) && $countPublish == 0 && count($resource) == 0){
                
-                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
+                $array['regs'] = self::oportunityRegistrationByStatus($getData['idopportunityReport'], 10);
                 
                 if(empty($array['regs']['regs'])) {
                     self::handleRedirect('Ops! Você deve publicar a oportunidade para esse relatório.', 401, $getData['idopportunityReport']);
@@ -198,7 +205,7 @@ class Pdf extends \MapasCulturais\Entity{
                     $app->redirect($app->createUrl('oportunidade/'.$getData['idopportunityReport'].'#/tab=inscritos'), 401);
                 }
             }else{
-                $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
+                $array['regs'] = self::oportunityRegistrationByStatus($getData['idopportunityReport'], 10);
                 $array['title'] = 'Resultado Definitivo do Certame';
                 $array['template'] = 'pdf/definitive';
             }
@@ -209,7 +216,7 @@ class Pdf extends \MapasCulturais\Entity{
     }
     
     static function listContactsHandle($app, $array, $getData){
-        $array['regs'] = self::oportunityRegistrationAproved($getData['idopportunityReport'], 10);
+        $array['regs'] = self::oportunityRegistrationByStatus($getData['idopportunityReport'], 10);
 
         if(empty($regs['regs']['regs'])){
             self::handleRedirect('', 401, $getData['idopportunityReport']);
