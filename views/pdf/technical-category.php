@@ -12,10 +12,12 @@
 
     function invenDescSort($item1,$item2){
         if ($item1->consolidatedResult == $item2->consolidatedResult) return 0;
-        return ($item1->consolidatedResult < $item2->consolidatedResult) ? 1 : -1;
+        return ($item1->consolidatedResult < $item2->consolidatedResult) ? -1 : 1;
     }
     if($type == "technicalna" && isset($preliminary)){
         $sub = Pdf::sortArrayForNAEvaluations($sub, $opp);
+    }else{
+        usort($sub, 'invenDescSort');
     }
 ?>
 <div class="container">
