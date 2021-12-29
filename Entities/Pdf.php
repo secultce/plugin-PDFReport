@@ -541,4 +541,68 @@ class Pdf extends \MapasCulturais\Entity{
         
         return $fields;
     }
+
+    static public function sortArrayForNAEvaluations($sub, $opp){
+
+        $app = App::i();
+
+        $committee = $opp->getEvaluationCommittee();
+        
+        $users = [];
+        foreach ($committee as $item) {
+            $users[] = $item->agent->user->id;
+        }
+
+        $status = [ 
+            \MapasCulturais\Entities\RegistrationEvaluation::STATUS_EVALUATED,
+            \MapasCulturais\Entities\RegistrationEvaluation::STATUS_SENT
+        ];
+
+        usort($sub, function($item1,$item2) use ($app, $users, $status){
+            // Comparação das notas para saber se os itens possuem a mesma nota consolidade para que possamos fazer a verificação das notas dos criterios
+            if ($item1->consolidatedResult == $item2->consolidatedResult) {
+                // Pegando as avaliações dos objetos que estão sendo comparados para ordenação;
+                $evaluations_1 = $app->repo('RegistrationEvaluation')->findByRegistrationAndUsersAndStatus($item1, $users, $status);
+                $evaluations_2 = $app->repo('RegistrationEvaluation')->findByRegistrationAndUsersAndStatus($item2, $users, $status);
+                $eval_1 = $eval_2 = [];
+                // Preenchimento dos arrays para comparação das notas
+                foreach ($evaluations_1 as $eval){
+                    $cfg = $eval->getEvaluationMethodConfiguration();
+                    $eval_1 = $eval->evaluationData;
+                }
+                foreach ($evaluations_2 as $eval){
+                    $cfg = $eval->getEvaluationMethodConfiguration();
+                    $eval_2 = $eval->evaluationData;
+                }
+                $count = 0;
+                foreach($eval_1 as $key => $value){
+                    // Inicialização do count para verificar final.
+                    $count++;
+                    if($key != 'na' && $key != 'obs'){
+                        // Se o valor do elemento um for diferente de vazio (diferente de não se aplica) e o segundo for igual a "" ( Não se aplica), colocar o elemento um na frente
+                        if($value != "" && $eval_2->$key == ""){
+                            return -1;
+                        }
+                        // Inverso do comentario acima
+                        else if($value == "" && $eval_2->$key != ""){
+                            return 1;
+                        }else if($value < $eval_2->$key){
+                            return 1;
+                        }else if($value > $eval_2->$key){
+                            return -1;
+                        }else{
+                            // Se o array chegar ao final e não tiver entrado em um dos ifs acima, declarar que os valores são iguais
+                            if($count == count((array)$eval_2)){
+                                return 0;
+                            }
+                        }
+                    }
+                    
+                }
+                return 0;
+            }
+            return ($item1->consolidatedResult < $item2->consolidatedResult) ? 1 : -1;
+        });
+        return $sub;
+    }
 }
