@@ -16,7 +16,8 @@
     }
     if($type == "technicalna" && isset($preliminary)){
         $sub = Pdf::sortArrayForNAEvaluations($sub, $opp);
-    }else{
+    }else if(!isset($preliminary)){}
+    else{
         usort($sub, 'invenDescSort');
     }
 ?>
