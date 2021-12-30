@@ -568,36 +568,37 @@ class Pdf extends \MapasCulturais\Entity{
                 // Preenchimento dos arrays para comparação das notas
                 foreach ($evaluations_1 as $eval){
                     $cfg = $eval->getEvaluationMethodConfiguration();
-                    $eval_1 = $eval->evaluationData;
+                    $eval_1[] = $eval->evaluationData;
                 }
                 foreach ($evaluations_2 as $eval){
                     $cfg = $eval->getEvaluationMethodConfiguration();
-                    $eval_2 = $eval->evaluationData;
+                    $eval_2[] = $eval->evaluationData;
                 }
                 $count = 0;
                 foreach($eval_1 as $key => $value){
                     // Inicialização do count para verificar final.
                     $count++;
-                    if($key != 'na' && $key != 'obs'){
-                        // Se o valor do elemento um for diferente de vazio (diferente de não se aplica) e o segundo for igual a "" ( Não se aplica), colocar o elemento um na frente
-                        if($value != "" && $eval_2->$key == ""){
-                            return -1;
-                        }
-                        // Inverso do comentario acima
-                        else if($value == "" && $eval_2->$key != ""){
-                            return 1;
-                        }else if($value < $eval_2->$key){
-                            return 1;
-                        }else if($value > $eval_2->$key){
-                            return -1;
-                        }else{
-                            // Se o array chegar ao final e não tiver entrado em um dos ifs acima, declarar que os valores são iguais
-                            if($count == count((array)$eval_2)){
-                                return 0;
+                    foreach($value as $key2 => $value2){
+                        if($key2 != 'na' && $key2 != 'obs'){
+                            // Se o valor do elemento um for diferente de vazio (diferente de não se aplica) e o segundo for igual a "" ( Não se aplica), colocar o elemento um na frente
+                            if($value != "" && $eval_2[$key]->$key2 == ""){
+                                return -1;
+                            }
+                            // Inverso do comentario acima
+                            else if($value == "" && $eval_2[$key]->$key2 != ""){
+                                return 1;
+                            }else if($value < $eval_2[$key]->$key2){
+                                return 1;
+                            }else if($value > $eval_2[$key]->$key2){
+                                return -1;
+                            }else{
+                                // Se o array chegar ao final e não tiver entrado em um dos ifs acima, declarar que os valores são iguais
+                                if($count == count((array)$eval_2)){
+                                    return 0;
+                                }
                             }
                         }
                     }
-                    
                 }
                 return 0;
             }

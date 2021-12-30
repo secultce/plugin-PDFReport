@@ -38,7 +38,7 @@
                     <th class="text-left" style="margin-top: 5px;" width="22%">Inscrição</th>
                     <th class="text-left" width="68%">Candidatos</th>
                     <?php 
-                        if($type == "technicalna"){
+                        if($type == "technicalna" && !isset($preliminary)){
                             echo '<th class="text-center" width="10%">NP</th>' ;
                         }
                         else if(isset($preliminary)){
@@ -71,7 +71,7 @@
                             <td class="text-left"><?php echo $nameSub->number; ?></td>
                             <td class="text-left"><?php echo $nameSub->owner->name; ?></td>
                             <?php 
-                                if($type == "technicalna"){ ?>
+                                if($type == "technicalna" && !isset($preliminary)){ ?>
                                     <td class="text-center"><?php echo $nameSub->preliminaryResult; ?></td>
                                 <?php }else if(isset($preliminary)){ ?>
                                     <td class="text-center"><?php echo $nameSub->consolidatedResult; ?></td>
