@@ -581,15 +581,15 @@ class Pdf extends \MapasCulturais\Entity{
                     foreach($value as $key2 => $value2){
                         if($key2 != 'na' && $key2 != 'obs'){
                             // Se o valor do elemento um for diferente de vazio (diferente de não se aplica) e o segundo for igual a "" ( Não se aplica), colocar o elemento um na frente
-                            if($value != "" && $eval_2[$key]->$key2 == ""){
+                            if($value2 != "" && $eval_2[$key]->$key2 == ""){
                                 return -1;
                             }
                             // Inverso do comentario acima
-                            else if($value == "" && $eval_2[$key]->$key2 != ""){
+                            else if($value2 == "" && $eval_2[$key]->$key2 != ""){
                                 return 1;
-                            }else if($value < $eval_2[$key]->$key2){
+                            }else if($value2 < $eval_2[$key]->$key2){
                                 return 1;
-                            }else if($value > $eval_2[$key]->$key2){
+                            }else if($value2 > $eval_2[$key]->$key2){
                                 return -1;
                             }else{
                                 // Se o array chegar ao final e não tiver entrado em um dos ifs acima, declarar que os valores são iguais
