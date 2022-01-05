@@ -14,10 +14,9 @@
         if ($item1->consolidatedResult == $item2->consolidatedResult) return 0;
         return ($item1->consolidatedResult < $item2->consolidatedResult) ? 1 : -1;
     }
-    if($type == "technicalna" && isset($preliminary)){
+    if($type == "technicalna"){
         $sub = Pdf::sortArrayForNAEvaluations($sub, $opp);
-    }else if(!isset($preliminary)){}
-    else{
+    }else{
         usort($sub, 'invenDescSort');
     }
 ?>
