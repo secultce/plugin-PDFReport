@@ -11,18 +11,20 @@
     <table id="table-preliminar" width="100%" >
         <thead>
             <tr>
-                <th class="text-center" width="30%">Inscrição</th>
-                <th class="text-center" width="50%">Candidatos</th>
+                <th class="text-left" width="30%">Inscrição</th>
+                <th class="text-left" width="50%">Candidatos</th>
                 <th class="text-center" width="20%">Status</th>
             </tr>
         </thead>
         <tbody>
             <?php 
             $isExist = false;
-            foreach($sub as $key => $nameSub){?>
+            $arrayCheck = [];
+            foreach($sub as $key => $nameSub){
+                    $arrayCheck[] = $nameSub->category;?>
                     <tr>
-                        <td class="text-center"><?php echo $nameSub->number; ?></td>
-                        <td class="text-center"><?php echo $nameSub->owner->name; ?></td>
+                        <td class="text-left"><?php echo $nameSub->number; ?></td>
+                        <td class="text-left"><?php echo $nameSub->owner->name; ?></td>
                         <td class="text-center"><?php echo RegistrationStatus::getStatusNameById($nameSub->status); ?> </td>
                     </tr>
                 <?php

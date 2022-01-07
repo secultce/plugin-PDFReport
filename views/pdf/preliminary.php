@@ -17,13 +17,13 @@
     </div>
     <?php    
         $type = $opportunity->evaluationMethodConfiguration->type->id;
-        if($opportunity->registrationCategories == "" &&  ($type == 'technical' || $type == 'technicalna')){
+        if($opportunity->registrationCategories == "" &&  ($type == 'technical' || $type == 'technicalna' || $type == 'homolog')){
             include_once('technical-no-category.php');
-        }elseif($opportunity->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary'){
+        }elseif($opportunity->registrationCategories == "" &&  $type == 'simple'|| $type == 'documentary' || $type == 'homolog'){
             include_once('simple-documentary-no-category.php');
-        }elseif($opportunity->registrationCategories !== "" &&  ($type == 'technical' || $type == 'technicalna')){
+        }elseif($opportunity->registrationCategories !== "" &&  ($type == 'technical' || $type == 'technicalna' || $type == 'homolog')){
             include_once('technical-category.php');
-        }elseif($opportunity->registrationCategories !== "" &&  $type == 'simple'|| $type == 'documentary'){
+        }elseif($opportunity->registrationCategories !== "" &&  $type == 'simple'|| $type == 'documentary' || $type == 'homolog'){
             include_once('simple-documentary-category.php');
         }
     ?>
