@@ -48,10 +48,8 @@ class Plugin extends \MapasCulturais\Plugin {
     public function showButtonPrint($id)
     {
         $app = App::i();
-
         $registration = $app->repo('Registration')->find($id);
-        
-        if($registration->status <> 0) {
+        if(!is_null($registration) && $registration->status <> 0) {
             $app->view->part('reports/button-print', ['id' => $id]);
         }
     }
