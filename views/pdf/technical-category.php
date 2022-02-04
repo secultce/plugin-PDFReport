@@ -68,7 +68,7 @@
                                 <?php }
                             ?>
                             <td class="text-left"><?php echo $nameSub->number; ?></td>
-                            <td class="text-left"><?php echo $nameSub->owner->name; ?></td>
+                            <td class="text-left"><?php echo mb_strtoupper($nameSub->owner->name); ?></td>
                             <?php 
                                 if($type == "technicalna" && !isset($preliminary)){ ?>
                                     <td class="text-center"><?php echo $nameSub->preliminaryResult; ?></td>

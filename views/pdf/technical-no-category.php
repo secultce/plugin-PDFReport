@@ -40,7 +40,7 @@
                             <?php }
                         ?>
                         <td class="text-left"><?php echo $nameSub->number; ?></td>
-                        <td class="text-left"><?php echo $nameSub->owner->name; ?></td>
+                        <td class="text-left"><?php echo mb_strtoupper($nameSub->owner->name); ?></td>
                         <td class="text-center"><?php echo !isset($preliminary) ? $nameSub->preliminaryResult : $nameSub->consolidatedResult; ?></td>
                     </tr>
                 <?php
