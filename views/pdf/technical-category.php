@@ -1,6 +1,4 @@
 <?php 
-    use MapasCulturais\App;
-    use Saude\Utils\RegistrationStatus;
     use PDFReport\Entities\Pdf;
 
     $this->layout = 'nolayout-pdf'; 
@@ -10,14 +8,38 @@
     $sections = $opp->evaluationMethodConfiguration->sections;
     $criterios = $opp->evaluationMethodConfiguration->criteria;
 
-    function invenDescSort($item1,$item2){
-        if ($item1->consolidatedResult == $item2->consolidatedResult) return 0;
-        return ($item1->consolidatedResult < $item2->consolidatedResult) ? 1 : -1;
-    }
     if($type == "technicalna"){
         $sub = Pdf::sortArrayForNAEvaluations($sub, $opp);
     }else{
-        usort($sub, 'invenDescSort');
+        $inscritos = [];
+        foreach ($sub as $key => $reg) {
+            $noteSection = [];
+            foreach ($sections as $key => $sec) {
+                if(in_array($reg->category, $sec->categories)){
+                    $noteSection[] = Pdf::getSectionNote($opp, $reg, $sec->id);
+                 } 
+            }
+
+            $now  = new DateTime("now");
+            $birth = new DateTime($reg->owner->dataDeNascimento);
+            $idade = $now->diff($birth);
+
+            $inscritos[] = [
+                'number' => $reg->number,
+                'name' => $reg->owner->name,
+                'preliminaryResult' => $reg->preliminaryResult,
+                'consolidatedResult' => $reg->consolidatedResult,
+                'category' => $reg->category,
+                'birth' => $reg->owner->dataDeNascimento,
+                'age' => ($idade->y >= 60 ) ? true : false,
+                'noteSection1' => (float) $noteSection[0]
+            ];
+        }
+    
+        usort($inscritos, function ($a, $b) { 
+            return [$b['consolidatedResult'], $b['age'], $b['noteSection1'], $a['birth']] <=> [$a['consolidatedResult'], $a['age'], $a['noteSection1'], $b['birth']]; 
+        }); 
+
     }
 ?>
 <div class="container">
@@ -37,10 +59,7 @@
                     <th class="text-left" style="margin-top: 5px;" width="22%">Inscrição</th>
                     <th class="text-left" width="68%">Candidatos</th>
                     <?php 
-                        if($type == "technicalna" && !isset($preliminary)){
-                            echo '<th class="text-center" width="10%">NP</th>' ;
-                        }
-                        else if(isset($preliminary)){
+                        if(isset($preliminary)){
                             echo '<th class="text-center" width="10%">NF</th>' ;
                         }else{
                             foreach($sections as $key => $sec){
@@ -56,6 +75,7 @@
                 <?php 
                 $countArray = [];
                 $arrayCheck = [];
+                
                 foreach($sub as $key => $nameSub){
                     if($nameCat == $nameSub->category){
                         $countArray[$nameCat][] = $key;
