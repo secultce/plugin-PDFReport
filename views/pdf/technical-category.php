@@ -10,36 +10,37 @@
 
     if($type == "technicalna"){
         $sub = Pdf::sortArrayForNAEvaluations($sub, $opp);
-    }else{
-        $inscritos = [];
-        foreach ($sub as $key => $reg) {
-            $noteSection = [];
-            foreach ($sections as $key => $sec) {
-                if(in_array($reg->category, $sec->categories)){
-                    $noteSection[] = Pdf::getSectionNote($opp, $reg, $sec->id);
-                 }
+    }
+
+    $inscritos = [];
+    foreach ($sub as $key => $reg) {
+        $noteSection = [];
+        foreach ($sections as $key => $sec) {
+            if(in_array($reg->category, $sec->categories)){
+                $noteSection[] = Pdf::getSectionNote($opp, $reg, $sec->id);
             }
-
-            $now  = new DateTime("now");
-            $birth = new DateTime($reg->owner->dataDeNascimento);
-            $idade = $now->diff($birth);
-
-            $inscritos[] = [
-                'number' => $reg->number,
-                'name' => $reg->owner->name,
-                'preliminaryResult' => $reg->preliminaryResult,
-                'consolidatedResult' => $reg->consolidatedResult,
-                'category' => $reg->category,
-                'birth' => $reg->owner->dataDeNascimento,
-                'age' => ($idade->y >= 60 ) ? true : false,
-                'noteSection1' => (float) $noteSection[0]
-            ];
         }
 
+        $now  = new DateTime("now");
+        $birth = new DateTime($reg->owner->dataDeNascimento);
+        $idade = $now->diff($birth);
+
+        $inscritos[] = [
+            'number' => $reg->number,
+            'name' => $reg->owner->name,
+            'preliminaryResult' => $reg->preliminaryResult,
+            'consolidatedResult' => $reg->consolidatedResult,
+            'category' => $reg->category,
+            'birth' => $reg->owner->dataDeNascimento,
+            'age' => ($idade->y >= 60 ) ? true : false,
+            'noteSection1' => (float) $noteSection[0]
+        ];
+    }
+
+    if($type == "technical") {
         usort($inscritos, function ($a, $b) {
             return [$b['consolidatedResult'], $b['age'], $b['noteSection1'], $a['birth']] <=> [$a['consolidatedResult'], $a['age'], $a['noteSection1'], $b['birth']];
         });
-
     }
 ?>
 <div class="container">
