@@ -13,9 +13,9 @@
     }
 
     $inscritos = [];
-    foreach ($sub as $key => $reg) {
+    foreach ($sub as $reg) {
         $noteSection = [];
-        foreach ($sections as $key => $sec) {
+        foreach ($sections as $sec) {
             if(in_array($reg->category, $sec->categories)){
                 $noteSection[] = Pdf::getSectionNote($opp, $reg, $sec->id);
             }
@@ -33,7 +33,8 @@
             'category' => $reg->category,
             'birth' => $reg->owner->dataDeNascimento,
             'age' => ($idade->y >= 60 ) ? true : false,
-            'noteSection1' => (float) $noteSection[0]
+            'noteSection1' => (float) $noteSection[0],
+            'noteAllSections' => $noteSection,
         ];
     }
 
@@ -96,11 +97,11 @@
                                 <?php }else if(isset($preliminary)){ ?>
                                     <td class="text-center"><?php echo $ins['consolidatedResult']; ?></td>
                                 <?php } else{
-                                    foreach($sections as $sec){
-                                        if(in_array($ins['category'], $sec->categories)){ ?>
-                                            <td class="text-center"><?php echo Pdf::getSectionNote($opp, $ins, $sec->id); ?></td>
-                            <?php       }
-                                    }
+                                    foreach($ins['noteAllSections'] as $noteSection):
+                                ?>
+                                    <td class="text-center"><?php echo $noteSection; ?></td>
+                                <?php
+                                    endforeach;
                                 }
                             ?>
                         </tr>
