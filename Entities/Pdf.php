@@ -496,7 +496,7 @@ class Pdf extends \MapasCulturais\Entity{
             ]);
         }
         //VERIFICANDO DE TEM ARQUVIOS
-        if($registrationOpportunity->registrationFileConfigurations->count() > 0) {
+        if(isset($registrationOpportunity->registrationFileConfigurations) && $registrationOpportunity->registrationFileConfigurations->count() > 0) {
             
             foreach ($registrationOpportunity->registrationFileConfigurations as $key => $file) {
                 $fileRegistration = self::getFileRegistration($registration, $file->fileGroupName);
