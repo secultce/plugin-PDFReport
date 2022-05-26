@@ -30,7 +30,22 @@ class Plugin extends \MapasCulturais\Plugin {
         });
 
         $plugin = $this;
+
+        $app->hook('template(registration.view.registration-single-header):before', function () use ($app, $plugin) {
+            $app->view->enqueueStyle('app', 'pdfreport', 'css/styleButtonPrint.css');
+            $id = $this->data['entity']->id;
+            $plugin->showButtonPrint($id);
+        });
        
+    }
+
+    public function showButtonPrint($id)
+    {
+        $app = App::i();
+        $registration = $app->repo('Registration')->find($id);
+        if(!is_null($registration) && $registration->status <> 0) {
+            $app->view->part('reports/button-print', ['id' => $id]);
+        }
     }
 
     public function register() {
