@@ -15,6 +15,7 @@ $newAgentData['nomeCompleto'] = $reg->owner->nomeCompleto;
 
 $agentMetaData = array_merge($result['owner'], $newAgentData);
 
+$registrationMeta = $reg->getMetadata();
 ?>
 
 <div class="border-section">
@@ -130,7 +131,9 @@ $agentMetaData = array_merge($result['owner'], $newAgentData);
                     if(isset($valueMeta) && $valueMeta->value !== "" && isset($valueMeta->value)) {
                         $meta = $valueMeta->value;
                     }
-                    Pdf::showAgenteOwnerField($fields['config']['entityField'], $meta, $agentMetaData);
+
+                    Pdf::showAgenteOwnerField($fields, $meta, $registrationMeta);
+
                     echo $endSpan;
                 }
 

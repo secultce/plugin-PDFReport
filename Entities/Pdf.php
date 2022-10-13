@@ -329,53 +329,58 @@ class Pdf extends \MapasCulturais\Entity{
         echo substr($items, 0 ,-1);
     }
     
-    static public function showAgenteOwnerField($field, $metaData, $owner) {
+    static public function showAgenteOwnerField($field, $metaData, $registrationMeta) {
         $valueField = null;
-        if ($field == '@location') {
-            if(!is_null($owner['En_Complemento'])) {
-                $valueField = "CEP: ".$owner['En_CEP'].', 
-                Logradouro: '.$owner['En_Nome_Logradouro'].', 
-                Nº: '.$owner['En_Num'].', Comp: '.$owner['En_Complemento'].', 
-                Bairro: '.$owner['En_Bairro'].', 
-                Cidade: '.$owner['En_Municipio'].', 
-                UF: '.$owner['En_Estado'];
-                
-            }else{
-                $valueField = "CEP: ".$owner['En_CEP'].', 
-                Logradouro: '.$owner['En_Nome_Logradouro'].', 
-                Nº: '.$owner['En_Num'].', 
-                Bairro: '.$owner['En_Bairro'].', 
-                Cidade: '.$owner['En_Municipio'].', 
-                UF: '.$owner['En_Estado'];              
-            }
-            
-        }elseif( $field == '@terms:area' ||
-            $field == 'longDescription'){
-            $valueField = trim(preg_replace('/\PL/u', ' ', $metaData));
-        }elseif($field == 'name' || $field == 'nomeCompleto' || $field == 'shortDescription' ||
-                $field == "genero" || $field == 'telefone1' || $field == 'telefone2' || $field == 'emailPrivado' || $field == 'emailPublico') {
-                
-                $valueField = $owner[$field];
+        $configEntityField = $field['config']['entityField'];
+        $fieldIdString = 'field_' . $field['id'];
+        if (isset($registrationMeta[$fieldIdString])) {
+            if ($configEntityField == '@location') {
+                $location = json_decode($registrationMeta[$fieldIdString], true);
+                if (isset($location['En_Complemento'])) {
+                    $valueField = "CEP: " . $location['En_CEP'] . ', 
+                    Logradouro: ' . $location['En_Nome_Logradouro'] . ', 
+                    Nº: ' . $location['En_Num'] . ', Comp: ' . $location['En_Complemento'] . ', 
+                    Bairro: ' . $location['En_Bairro'] . ', 
+                    Cidade: ' . $location['En_Municipio'] . ', 
+                    UF: ' . $location['En_Estado'];
 
-        }elseif($field == "facebook" || $field == "intagram" || 
-                $field == "twitter" || $field == "site" || 
-                $field == "googleplus"){
+                } else {
+                    $valueField = "CEP: " . $location['En_CEP'] . ', 
+                    Logradouro: ' . $location['En_Nome_Logradouro'] . ', 
+                    Nº: ' . $location['En_Num'] . ', 
+                    Bairro: ' . $location['En_Bairro'] . ', 
+                    Cidade: ' . $location['En_Municipio'] . ', 
+                    UF: ' . $location['En_Estado'];
+                }
+
+            } elseif ($configEntityField == '@terms:area' ||
+                $configEntityField == 'longDescription') {
+                $valueField = trim(preg_replace('/\PL/u', ' ', $metaData));
+
+            } elseif ($configEntityField == 'name' || $configEntityField == 'nomeCompleto' || $configEntityField == 'shortDescription' ||
+                $configEntityField == "genero" || $configEntityField == 'telefone1' || $configEntityField == 'telefone2' || $configEntityField == 'emailPrivado' || $configEntityField == 'emailPublico' || $configEntityField == 'rg') {
+                $valueField = str_replace('"', '', json_decode($registrationMeta[$fieldIdString]));
+
+            } elseif ($configEntityField == "facebook" || $configEntityField == "intagram" ||
+                $configEntityField == "twitter" || $configEntityField == "site" ||
+                $configEntityField == "googleplus") {
                 $valueField = str_replace(array('\\', '"'), '', $metaData);
-        }
-        elseif( $field == 'dataDeNascimento') {
-            
-            $date = DateTime::createFromFormat('Y-m-d', $owner['dataDeNascimento']);
-            $valueField = $date->format('d/m/Y');
-
-        }elseif($field == 'documento') { // PARA FORMATAR CPF OU CNPJ
-            $doc =  self::clearCPF_CNPJ($owner[$field]); // retirando formatação caso venha
-            $str = strlen($doc); // total de carecteres
-            if($str == 11) {
-                $valueField = self::mask($doc,'###.###.###-##');
-            }else{
-                $valueField = self::mask($doc,'##.###.###/####-##');
+            } elseif ($configEntityField == 'dataDeNascimento') {
+                if (!empty($registrationMeta[$fieldIdString])) {
+                    $date = new DateTime(str_replace('"', '', $registrationMeta[$fieldIdString]));
+                    $valueField = $date->format('d/m/Y');
+                }
+            } elseif ($configEntityField == 'documento') { // PARA FORMATAR CPF OU CNPJ
+                $doc = self::clearCPF_CNPJ(str_replace('"', '', $registrationMeta[$fieldIdString])); // retirando formatação caso venha
+                $str = strlen($doc); // total de carecteres
+                if ($str == 11) {
+                    $valueField = self::mask($doc, '###.###.###-##');
+                } else {
+                    $valueField = self::mask($doc, '##.###.###/####-##');
+                }
             }
         }
+
         if(!is_null($valueField)) {
             echo $valueField;
         }else{
