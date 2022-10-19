@@ -16,7 +16,7 @@
     foreach ($sub as $reg) {
         $noteSection = [];
         foreach ($sections as $sec) {
-            if(in_array($reg->category, $sec->categories)){
+            if(isset($sec->categories) && in_array($reg->category, $sec->categories)) {
                 $noteSection[] = Pdf::getSectionNote($opp, $reg, $sec->id);
             }
         }
@@ -25,22 +25,41 @@
         $birth = new DateTime($reg->owner->dataDeNascimento);
         $idade = $now->diff($birth);
 
-        $inscritos[] = [
-            'number' => $reg->number,
-            'name' => $reg->owner->name,
-            'preliminaryResult' => $reg->preliminaryResult,
-            'consolidatedResult' => $reg->consolidatedResult,
-            'category' => $reg->category,
-            'birth' => $reg->owner->dataDeNascimento,
-            'age' => ($idade->y >= 60 ) ? true : false,
-            'noteSection1' => (float) $noteSection[0],
-            'noteAllSections' => $noteSection,
-        ];
+        if (isset($noteSection[0])) {
+            $inscritos[] = [
+                'number' => $reg->number,
+                'name' => $reg->owner->name,
+                'preliminaryResult' => $reg->preliminaryResult,
+                'consolidatedResult' => $reg->consolidatedResult,
+                'category' => $reg->category,
+                'birth' => $reg->owner->dataDeNascimento,
+                'age' => ($idade->y >= 60 ) ? true : false,
+                'noteSection1' => (float) $noteSection[0],
+                'noteAllSections' => $noteSection,
+            ];
+        } else {
+            $inscritos[] = [
+                'number' => $reg->number,
+                'name' => $reg->owner->name,
+                'preliminaryResult' => $reg->preliminaryResult,
+                'consolidatedResult' => $reg->consolidatedResult,
+                'category' => $reg->category,
+                'birth' => $reg->owner->dataDeNascimento,
+                'age' => ($idade->y >= 60 ) ? true : false,
+                'noteAllSections' => $noteSection,
+            ];
+        }
+
+
     }
 
     if($type == "technical") {
         usort($inscritos, function ($a, $b) {
-            return [$b['consolidatedResult'], $b['age'], $b['noteSection1'], $a['birth']] <=> [$a['consolidatedResult'], $a['age'], $a['noteSection1'], $b['birth']];
+            if (isset($a['noteSection1']) && isset($b['noteSection1'])) {
+                return [$b['consolidatedResult'], $b['age'], $b['noteSection1'], $a['birth']] <=> [$a['consolidatedResult'], $a['age'], $a['noteSection1'], $b['birth']];
+            } else {
+                return [$b['consolidatedResult'], $b['age'], $a['birth']] <=> [$a['consolidatedResult'], $a['age'], $b['birth']];
+            }
         });
     }
 ?>
@@ -65,12 +84,12 @@
                             echo '<th class="text-center" width="10%">NF</th>' ;
                         }else{
                             foreach($sections as $key => $sec){
-                                if(in_array($nameCat, $sec->categories)){ ?>
+                                if(isset($sec->categories) && in_array($nameCat, $sec->categories)){ ?>
                                     <th class="text-center" width="<?php echo count($sections) > 1 ? "5%" : "10%" ?>"><?php echo 'N'.($key + 1).'E' ?></th>
                         <?php   }
                             }
                         }
-                    ?>
+                    ?>g
                 </tr>
             </thead>
             <tbody>
