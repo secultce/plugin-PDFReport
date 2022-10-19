@@ -3,7 +3,7 @@
     $sub = $app->view->jsObject['subscribers'];
     $nameOpportunity = $sub[0]->opportunity->name;
     $opp = $app->view->jsObject['opp'];
-    $verifyResource = $this->verifyResource($this->postData['idopportunityReport']);
+    $verifyResource = \PDFReport\Entities\Pdf::verifyResource($this->postData['idopportunityReport']);
     $claimDisabled = $app->view->jsObject['claimDisabled'];
     include_once('header-pdf.php'); 
 ?>
