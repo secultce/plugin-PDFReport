@@ -16,7 +16,7 @@
     foreach ($sub as $reg) {
         $noteSection = [];
         foreach ($sections as $sec) {
-            if(isset($sec->categories) && in_array($reg->category, $sec->categories)) {
+            if(!isset($sec->categories) || in_array($reg->category, $sec->categories)) {
                 $noteSection[] = Pdf::getSectionNote($opp, $reg, $sec->id);
             }
         }
@@ -83,9 +83,10 @@
                         if(isset($preliminary)){
                             echo '<th class="text-center" width="10%">NF</th>' ;
                         }else{
+                            $notaIndex = 1;
                             foreach($sections as $key => $sec){
-                                if(isset($sec->categories) && in_array($nameCat, $sec->categories)){ ?>
-                                    <th class="text-center" width="<?php echo count($sections) > 1 ? "5%" : "10%" ?>"><?php echo 'N'.($key + 1).'E' ?></th>
+                                if(!isset($sec->categories) || in_array($nameCat, $sec->categories)){ ?>
+                                    <th class="text-center" width="<?php echo count($sections) > 1 ? "5%" : "10%" ?>"><?php echo 'N'.($notaIndex++) ?></th>
                         <?php   }
                             }
                         }
