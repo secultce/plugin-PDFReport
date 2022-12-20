@@ -126,13 +126,8 @@ $registrationMeta = $reg->getMetadata();
                                 
                 if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
                     echo $iniSpan;
-                    $meta = null;
-                    
-                    if(isset($valueMeta) && $valueMeta->value !== "" && isset($valueMeta->value)) {
-                        $meta = $valueMeta->value;
-                    }
 
-                    Pdf::showAgenteOwnerField($fields, $meta, $registrationMeta);
+                    Pdf::showAgenteOwnerField($fields, $valueMeta->value);
 
                     echo $endSpan;
                 }

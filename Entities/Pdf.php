@@ -329,13 +329,13 @@ class Pdf extends \MapasCulturais\Entity{
         echo substr($items, 0 ,-1);
     }
     
-    static public function showAgenteOwnerField($field, $metaData, $registrationMeta) {
+    static public function showAgenteOwnerField($field, $metaData) {
         $valueField = null;
         $configEntityField = $field['config']['entityField'];
-        $fieldIdString = 'field_' . $field['id'];
-        if (isset($registrationMeta[$fieldIdString])) {
+
+        if (isset($metaData)) {
             if ($configEntityField == '@location') {
-                $location = json_decode($registrationMeta[$fieldIdString], true);
+                $location = json_decode($metaData, true);
                 if (isset($location['En_Complemento'])) {
                     $valueField = "CEP: " . $location['En_CEP'] . ', 
                     Logradouro: ' . $location['En_Nome_Logradouro'] . ', 
@@ -359,19 +359,19 @@ class Pdf extends \MapasCulturais\Entity{
 
             } elseif ($configEntityField == 'name' || $configEntityField == 'nomeCompleto' || $configEntityField == 'shortDescription' ||
                 $configEntityField == "genero" || $configEntityField == 'telefone1' || $configEntityField == 'telefone2' || $configEntityField == 'emailPrivado' || $configEntityField == 'emailPublico' || $configEntityField == 'rg') {
-                $valueField = str_replace('"', '', json_decode($registrationMeta[$fieldIdString]));
+                $valueField = str_replace('"', '', json_decode($metaData));
 
             } elseif ($configEntityField == "facebook" || $configEntityField == "intagram" ||
                 $configEntityField == "twitter" || $configEntityField == "site" ||
                 $configEntityField == "googleplus") {
                 $valueField = str_replace(array('\\', '"'), '', $metaData);
             } elseif ($configEntityField == 'dataDeNascimento') {
-                if (!empty($registrationMeta[$fieldIdString])) {
-                    $date = new DateTime(str_replace('"', '', $registrationMeta[$fieldIdString]));
+                if (!empty($metaData)) {
+                    $date = new DateTime(str_replace('"', '', $metaData));
                     $valueField = $date->format('d/m/Y');
                 }
             } elseif ($configEntityField == 'documento') { // PARA FORMATAR CPF OU CNPJ
-                $doc = self::clearCPF_CNPJ(str_replace('"', '', $registrationMeta[$fieldIdString])); // retirando formatação caso venha
+                $doc = self::clearCPF_CNPJ(str_replace('"', '', $metaData)); // retirando formatação caso venha
                 $str = strlen($doc); // total de carecteres
                 if ($str == 11) {
                     $valueField = self::mask($doc, '###.###.###-##');
