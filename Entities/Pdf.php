@@ -366,10 +366,11 @@ class Pdf extends \MapasCulturais\Entity{
                 $configEntityField == "googleplus") {
                 $valueField = str_replace(array('\\', '"'), '', $metaData);
             } elseif ($configEntityField == 'dataDeNascimento') {
-                if (!empty($metaData)) {
-                    $date = new DateTime(str_replace('"', '', $metaData));
+                $metaData = str_replace('"', '', $metaData);
+                if ($metaData != '' && strtotime($metaData)) {
+                    $date = new DateTime($metaData);
                     $valueField = $date->format('d/m/Y');
-                }
+                }                
             } elseif ($configEntityField == 'documento') { // PARA FORMATAR CPF OU CNPJ
                 $doc = self::clearCPF_CNPJ(str_replace('"', '', $metaData)); // retirando formatação caso venha
                 $str = strlen($doc); // total de carecteres
