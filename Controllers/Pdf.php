@@ -112,7 +112,7 @@ class Pdf extends \MapasCulturais\Controller
         $mpdf->writingHTMLfooter = true;
 
         $mpdf->SetDisplayMode('fullpage');
-        $mpdf->SetTitle('Mapa da Saúde - Relatório');
+        $mpdf->SetTitle('Mapas Culturais - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH . 'PDFReport/assets/css/stylePdfReport.css');
         $mpdf->AddPage(
             '', // L - landscape, P - portrait 
@@ -188,7 +188,7 @@ class Pdf extends \MapasCulturais\Controller
         $mpdf->SetHTMLFooter($footerPage);
         $mpdf->SetHTMLFooter($footerPage, 'E');
 
-        $mpdf->SetTitle('Mapa da Saúde - Relatório');
+        $mpdf->SetTitle('Mapas Culturais - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH . 'PDFReport/assets/css/stylePdfReport.css');
         $mpdf->WriteHTML(ob_get_clean());
         $mpdf->WriteHTML($stylesheet, 1);
