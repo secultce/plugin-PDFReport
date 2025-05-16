@@ -6,6 +6,7 @@ require PLUGINS_PATH . 'PDFReport/vendor/autoload.php';
 require PLUGINS_PATH . 'PDFReport/vendor/dompdf/dompdf/src/FontMetrics.php';
 
 use DateTime;
+use MapasCulturais\Entities\Registration;
 use Mpdf\Mpdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -33,7 +34,7 @@ class Pdf extends \MapasCulturais\Controller
         'id' => 4,
         'title' => 'Relação de contatos',
         'enabled' => false,
-    ]; 
+    ];
 
     public static function getReports($id = null)
     {
@@ -134,7 +135,18 @@ class Pdf extends \MapasCulturais\Controller
         exit;
     }
 
-    function GET_minha_inscricao()
+    public function GET_minha_inscricao(): void
+    {
+        $app = App::i();
+        $reg = $app->repo('Registration')->find($this->data['id']);
+
+        //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
+        $fields = EntitiesPdf::showAllFieldAndFile($reg);
+
+        $this->renderMyRegistrationPDF($fields);
+    }
+
+    public function renderMyRegistrationPDF($registrationFieldConfigurations): void
     {
         ini_set('display_errors', 1);
         $app = App::i();
@@ -172,11 +184,6 @@ class Pdf extends \MapasCulturais\Controller
         //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
-        //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
-        $fields = EntitiesPdf::showAllFieldAndFile($reg);
-
-        //ORDENANDO O ARRAY EM ORDEM DE ID
-        $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
 
         ob_start();
@@ -197,5 +204,39 @@ class Pdf extends \MapasCulturais\Controller
         $file_name = 'Ficha_de_inscricao.pdf';
         $mpdf->Output();
         exit;
+    }
+
+    public function GET_inscricaoCompleta(): void
+    {
+        $app = App::i();
+        /** @var Registration $reg */
+        $reg = $app->repo('Registration')->find($this->data['id']);
+        $regs = $this->getAllPhasesRegistration($reg);
+
+        $fields = [];
+
+        foreach ($regs as $reg) {
+            $fields = array_merge($fields, EntitiesPdf::showAllFieldAndFile($reg));
+        }
+
+        $this->renderMyRegistrationPDF($fields);
+    }
+
+    private function getAllPhasesRegistration(Registration $reg): array
+    {
+        $regs = [$reg];
+
+        while(true) {
+            if (null === $reg->opportunity->parent) {
+                return $regs;
+            }
+
+            $app = App::i();
+            $reg = $app->repo('Registration')->findBy([
+                'opportunity' => $reg->opportunity->parent,
+                'number' => $reg->number,
+            ])[0];
+            $regs[] = $reg;
+        }
     }
 }
