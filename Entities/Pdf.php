@@ -289,6 +289,10 @@ class Pdf extends \MapasCulturais\Entity{
      */
     static public function showDecode($valueStr, $field = null, $nameField) {
         $stringDecodeJson = json_decode($valueStr, true);
+        if (!is_iterable($stringDecodeJson)) {
+            $stringDecodeJson = [['value' => $stringDecodeJson]];
+        }
+
         $arrayItens = [];
         foreach($stringDecodeJson as $item) {
             if(!is_null($field)) {

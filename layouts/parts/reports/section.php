@@ -99,7 +99,7 @@ $registrationMeta = $reg->getMetadata();
                             Pdf::showSpaceField($fields['config']['entityField'] , $valueMeta->value);
 
                         }else if($fields['fieldType'] == 'date') {
-                            echo 'aqui';
+
                             echo date("d/m/Y", strtotime($valueMeta->value));
 
                         }else if($fields['fieldType'] == 'links') {
