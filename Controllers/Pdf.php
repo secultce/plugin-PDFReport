@@ -2,14 +2,9 @@
 
 namespace PDFReport\Controllers;
 
-require PLUGINS_PATH . 'PDFReport/vendor/autoload.php';
-require PLUGINS_PATH . 'PDFReport/vendor/dompdf/dompdf/src/FontMetrics.php';
-
-use DateTime;
 use MapasCulturais\Entities\Registration;
 use Mpdf\Mpdf;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use Mpdf\HTMLParserMode;
 use \MapasCulturais\App;
 use PDFReport\Entities\Pdf as EntitiesPdf;
 
@@ -155,12 +150,16 @@ class Pdf extends \MapasCulturais\Controller
             $app->auth->requireAuthentication();
         }
 
-        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 
-                        'utf-8','format' => 'A4',
-                        'pagenumPrefix' => 'Página ',
-                        'pagenumSuffix' => '  ',
-                        'nbpgPrefix' => ' de ',
-            'nbpgSuffix' => ''
+        $mpdf = new Mpdf([
+            'tempDir' => '/tmp',
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'pagenumPrefix' => 'Página ',
+            'pagenumSuffix' => '  ',
+            'nbpgPrefix' => ' de ',
+            'nbpgSuffix' => '',
+            'margin_top' => 45,
+            'margin_bottom' => 30,
         ]);
 
         $reg = $app->repo('Registration')->find($this->data['id']);
@@ -189,19 +188,12 @@ class Pdf extends \MapasCulturais\Controller
         ob_start();
 
         $content = $app->view->fetch('pdf/my-registration');
-        $footerPage = $app->view->fetch('pdf/footer-page-pdf');
-        $footerDocumentPage = $app->view->fetch('pdf/footer-document-pdf');
-        
-        $mpdf->SetHTMLFooter($footerPage);
-        $mpdf->SetHTMLFooter($footerPage, 'E');
 
         $mpdf->SetTitle('Mapas Culturais - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH . 'PDFReport/assets/css/stylePdfReport.css');
-        $mpdf->WriteHTML(ob_get_clean());
-        $mpdf->WriteHTML($stylesheet, 1);
+        $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($content, 2);
-        $mpdf->SetHTMLFooter($footerPage . $footerDocumentPage);
-        $file_name = 'Ficha_de_inscricao.pdf';
+        $mpdf->WriteHTML(ob_get_clean());
         $mpdf->Output();
         exit;
     }

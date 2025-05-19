@@ -1,9 +1,9 @@
 <?php
-$this->layout = 'nolayout-pdf';
 
 $reg = $app->view->regObject['ins'];
 
-include_once('header-pdf.php'); 
+require THEMES_PATH . 'BaseV1/layouts/headpdf.php';
+
 ?>
 <table width="100%" style="height: 100px; margin-bottom: 24px; margin-top: 24px; width: 100%;">
     <thead>
@@ -167,7 +167,9 @@ include_once('header-pdf.php');
             </span><br>
         </div>
     </div>
-    <?php
+<?php
 $fieldOp = $app->view->regObject['fieldsOpportunity'];
 
 $this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
+
+require THEMES_PATH . 'BaseV1/views/pdf/footer-pdf.php';

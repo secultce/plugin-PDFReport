@@ -288,3 +288,9 @@ body {
    font-size: 10px;
 
 }
+
+@page {
+   margin-footer: 0px;
+   odd-header-name: html_MyHeader1;
+   odd-footer-name: html_MyFooter1;
+}
