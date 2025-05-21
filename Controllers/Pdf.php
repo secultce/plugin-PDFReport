@@ -224,10 +224,10 @@ class Pdf extends \MapasCulturais\Controller
             }
 
             $app = App::i();
-            $reg = $app->repo('Registration')->findBy([
+            $reg = $app->repo('Registration')->findOneBy([
                 'opportunity' => $reg->opportunity->parent,
                 'number' => $reg->number,
-            ])[0];
+            ]);
             $regs[] = $reg;
         }
     }
