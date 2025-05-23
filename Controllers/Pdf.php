@@ -136,7 +136,10 @@ class Pdf extends \MapasCulturais\Controller
         $reg = $app->repo('Registration')->find($this->data['id']);
 
         //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
-        $fields = EntitiesPdf::showAllFieldAndFile($reg);
+        $fields[] = [
+            'opportunityName' => $reg->opportunity->name,
+            'fields' => EntitiesPdf::showAllFieldAndFile($reg),
+        ];
 
         $this->renderMyRegistrationPDF($fields);
     }
@@ -194,7 +197,7 @@ class Pdf extends \MapasCulturais\Controller
         $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($content, 2);
         $mpdf->WriteHTML(ob_get_clean());
-        $mpdf->Output();
+        $mpdf->Output($reg->number . '.pdf', 'I');
         exit;
     }
 
@@ -208,7 +211,10 @@ class Pdf extends \MapasCulturais\Controller
         $fields = [];
 
         foreach ($regs as $reg) {
-            $fields = array_merge($fields, EntitiesPdf::showAllFieldAndFile($reg));
+            $fields[] = [
+                'opportunityName' => $reg->opportunity->name,
+                'fields' => EntitiesPdf::showAllFieldAndFile($reg),
+            ];
         }
 
         $this->renderMyRegistrationPDF($fields);

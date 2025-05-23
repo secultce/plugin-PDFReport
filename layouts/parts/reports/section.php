@@ -1,9 +1,14 @@
 <?php
-use PDFReport\Entities\Pdf;
+
+use MapasCulturais\App;
+use MapasCulturais\Entities\RegistrationFile;
 
 /**
- * RETORNO DE DOS METADATAS DO AGENTE COM OS INDICES SENDO O VALOR QUE ESTÁ 
+ * RETORNO DE DOS METADADOS DO AGENTE COM OS INDICES SENDO O VALOR QUE ESTÁ
  * EM KEY NA TABELA E O RESULTADO SENDO O VALOR QUE ESTÁ EM VALUE NA TABELA
+ *
+ * @var \MapasCulturais\Entities\Registration $reg
+ * @var array $fieldsOpportunities
  */
 $result = $reg->getAgentsData();
 unset($result['owner']['nomeCompleto ']);
@@ -16,141 +21,95 @@ $newAgentData['nomeCompleto'] = $reg->owner->nomeCompleto;
 $agentMetaData = array_merge($result['owner'], $newAgentData);
 
 $registrationMeta = $reg->getMetadata();
+
+$iniSpan = '<span class="my-registration-value-span">';
+$iniTitleSpan = '<span class="my-registration-value-span" style="font-weight: bold">';
+$endSpan = '</span>';
 ?>
 
+<?php foreach(array_reverse($fieldsOpportunities) as $fieldsOpportunity) { ?>
 <div class="border-section">
-    <h4 style="color: rgba(0, 0, 0, 0.87); font-family: Arial !important;">
-        <?php 
-        echo $reg->opportunity->name;
+    <h4 style="color: rgba(0, 0, 0, 0.87);font-family: Arial !important;">
+        <?php
+        echo $fieldsOpportunity['opportunityName'];
         ?>
     </h4>
+    <?php
+    foreach ($fieldsOpportunity['fields'] as $field) {
+        $fieldName = 'field_' . $field['id'];
 
-    <?php 
-        $check = 'Não confirmado';
-        $fieldValueAll = [];
-        $categories = [];
-        $isCategory = false;
-
-        foreach ($field as $fie => $fields) :
-            $valueMetas = Pdf::getValueField($fields['id'], $reg->id);
-            $showSpan = Pdf::getDependenciesField($reg, $fields);
-          
-            if(!is_null($fields['categories'])) {
-                $categories = $fields['categories'];
+        if (isset($field['config']['require'])) {
+            if (($field['config']['require']['hide'] ?? false) === '1') {
+                continue;
             }
-          
-            if($showSpan == true):
-               //SE CATEGORIA FOR VAZIO, MOSTRA O NOME DOS CAMPOS
-                if(empty($categories)) {
-                ?>
-                <span class="span-section">
-                    <?php
-                        if($fields['fieldType'] === 'section') {
-                            echo "<hr><br>";
-                            echo '<u>'.$fields['title'].'</u><br />';
-                        }else{
-                            echo $fields['title'].': ';
-                        }
-                    ?>
-                </span>
-            <?php 
-                //SE TIVER CATEGORIA E FOR IGUAL A CATEGORIA DA INSCRIÇÃO, MOSTRA O CAMPO
-                }elseif(in_array($reg->category, $categories)) {
-                    $isCategory = true; 
-                ?>
-                <span class="span-section">
-                    <?php
-                        if($fields['fieldType'] === 'section') {
-                            echo "<hr><br>";
-                            echo '<u>'.$fields['title'].'</u><br />';
-                        }else{
-                            echo $fields['title'].': ';
-                        }
-                    ?>
-                </span>
-            <?php } 
-               $iniSpan = '<span class="my-registration-value-span">';
-               $endSpan = '</span><br />';
-                foreach ($valueMetas as $keyMeta => $valueMeta) {
-                  
-                   if($fields['fieldType'] !== "agent-owner-field") {
-                    echo $iniSpan;
-                       //dump('value' , $valueMeta->value, $fields['fieldType']);
-                        if($fields['fieldType'] == 'checkbox') {  
-                            if($valueMeta->value) {
-                                echo $fields['description'];
-                            }else{
-                                echo "Não informado";
-                            }
-                        }else if($fields['fieldType'] == 'cnpj') {
 
-                            echo Pdf::mask($valueMeta->value,'##.###.###/####-##');
+            $requiredFieldName = $field['config']['require']['field'];
+            if ($field['config']['require']['value'] !== $reg->$requiredFieldName) {
+                continue;
+            }
+        }
 
-                        }else if($fields['fieldType'] == 'cpf') {
-                            
-                            echo Pdf::mask($valueMeta->value,'###.###.###-##');
-                        
-                        }else if($fields['fieldType'] == 'persons') {
+        switch ($field['fieldType']) {
+            case 'agent-owner-field':
+                $value = $field['config']['entityField'] === '@location'
+                    ? $reg->$fieldName->endereco
+                    : $reg->$fieldName;
 
-                            Pdf::showDecode($valueMeta->value, null, 'name');
+                $value = $field['config']['entityField'] === 'dataDeNascimento'
+                    ? date('d/m/Y', strtotime($value))
+                    : $value;
 
-                        }else if ($fields['fieldType'] == 'space-field') {
+                echo "<div>{$iniTitleSpan}{$field['title']}{$endSpan}: {$iniSpan}{$value}{$endSpan}</div>";
+                break;
+            case 'section': ?>
+                <h5 style="padding-left: 20px;margin-bottom: 2px;text-decoration: underline"><?= $field['title'] ?></h5>
+                <?php break;
+            case 'checkbox': ?>
+                <div>
+                    <span class="my-registration-value-span" style="font-weight: bold;"><?= $field['title'] ?>: </span>
+                    <span class="my-registration-value-span"><?= $reg->$fieldName === 'true' ? 'Sim' : 'Nao' ?></span>
+                </div>
+                <?php break;
+            case 'file': ?>
+                <div>
+                    <?= $iniTitleSpan . $field['title'] . $endSpan ?>:
+                    <?php foreach ($field['config'] as $file) {
+                        /** @var RegistrationFile $file */
+                        $file = App::i()->repo(RegistrationFile::class)
+                            ->find($file['id']);
 
-                            Pdf::showSpaceField($fields['config']['entityField'] , $valueMeta->value);
+                        echo "<a href='{$file->getUrl()}' class='my-reg-font-10'>{$file->name}</a> <br />";
+                    } ?>
+                </div>
+                <?php break;
+            case 'select':
+            case 'text': ?>
+                <div>
+                    <?= $iniTitleSpan . $field['title'] . $endSpan . ': '
+                        . $iniSpan . $reg->$fieldName . $endSpan ?>
+                </div>
+                <?php break;
+            case 'date': ?>
+                <div>
+                    <?= $iniTitleSpan . $field['title'] . $endSpan . ': '
+                        . $iniSpan . date('d/m/Y', strtotime($reg->$fieldName)) . $endSpan ?>
+                </div>
+                <?php break;
+            case 'links':
+                echo "<div>{$iniTitleSpan}{$field['title']}{$endSpan}: ";
+                $links = array_map(function ($link) {
+                    return "<a href='{$link}' target='_blank' rel='noopener noreferer'>{$link}</a>";
+                }, $reg->$fieldName);
 
-                        }else if($fields['fieldType'] == 'date') {
-
-                            echo date("d/m/Y", strtotime($valueMeta->value));
-
-                        }else if($fields['fieldType'] == 'links') {
-
-                            Pdf::showDecode($valueMeta->value, 'title', 'value');
-
-                        }else if($fields['fieldType'] == 'checkboxes') {
-
-                            Pdf::showItensCheckboxes($valueMeta->value);
-
-                        }else if($fields['fieldType'] == 'agent-collective-field') {
-
-                            Pdf::showAgentCollectiveField($fields['config']['entityField'], $valueMeta->value );
-                            
-                        }else if($valueMeta->value !== "") {
-                            echo $valueMeta->value;
-                        }else{
-                            echo '<span class="my-reg-font-10">Não informado</span>';
-                        }
-                        echo $endSpan;
-                   }
-                   
-                } 
-                                
-                if ($fields['fieldType'] == 'agent-owner-field') {   // PARA O TIPO DE CAMPO DE AGENTE 
-                    echo $iniSpan;
-
-                    Pdf::showAgenteOwnerField($fields, $valueMeta->value);
-
-                    echo $endSpan;
-                }
-
-                if ($fields['fieldType'] == 'file') { 
-                    
-                    if(empty($categories)) {
-                       
-                        require 'content-file.php';
-                       
-                    }elseif(in_array($reg->category, $categories)) {
-                       
-                        require 'content-file.php';
-                      
-                    }
-                }
-            ?>
-            
-            <?php  
-           
-            endif; //ENDIF showSpan
-        endforeach;
-       //die;
-    ?>
-</div>
-
+                echo implode('<br>', $links) . '</div>';
+                break;
+            case 'textarea':
+                echo "<div>{$iniTitleSpan}{$field['title']}{$endSpan}: ";
+                echo "{$iniSpan}{$reg->$fieldName}{$endSpan}</div>";
+                break;
+            default:
+                break;
+        }
+    }
+echo '</div>';
+}

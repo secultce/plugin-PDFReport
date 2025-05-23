@@ -170,6 +170,6 @@ require THEMES_PATH . 'BaseV1/layouts/headpdf.php';
 <?php
 $fieldOp = $app->view->regObject['fieldsOpportunity'];
 
-$this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
+$this->part('reports/section', ['fieldsOpportunities' => $fieldOp, 'reg' => $reg]);
 
 require THEMES_PATH . 'BaseV1/views/pdf/footer-pdf.php';

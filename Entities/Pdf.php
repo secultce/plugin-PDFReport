@@ -333,11 +333,11 @@ class Pdf extends \MapasCulturais\Entity{
         echo substr($items, 0 ,-1);
     }
     
-    static public function showAgenteOwnerField($field, $metaData) {
+    static public function showAgenteOwnerField($field, $metaData = null) {
         $valueField = null;
         $configEntityField = $field['config']['entityField'];
 
-        if (isset($metaData)) {
+        if ($metaData !== null) {
             if ($configEntityField == '@location') {
                 $location = json_decode($metaData, true);
                 if (isset($location['En_Complemento'])) {
