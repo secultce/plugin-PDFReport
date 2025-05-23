@@ -223,17 +223,30 @@ class Pdf extends \MapasCulturais\Controller
     private function getAllPhasesRegistration(Registration $reg): array
     {
         $regs = [$reg];
+        $visitedOpportunities = [];
 
-        while(true) {
+        while (true) {
             if (null === $reg->opportunity->parent) {
                 return $regs;
             }
+
+            // Detect cyclic parent relationships
+            if (in_array($reg->opportunity->parent->id, $visitedOpportunities, true)) {
+                throw new \RuntimeException('Cyclic parent relationship detected in opportunities.');
+            }
+
+            $visitedOpportunities[] = $reg->opportunity->id;
 
             $app = App::i();
             $reg = $app->repo('Registration')->findOneBy([
                 'opportunity' => $reg->opportunity->parent,
                 'number' => $reg->number,
             ]);
+
+            // Handle null result from findOneBy
+            if (null === $reg) {
+                throw new \RuntimeException('No matching registration found for parent opportunity.');
+            }
             $regs[] = $reg;
         }
     }
