@@ -289,6 +289,10 @@ class Pdf extends \MapasCulturais\Entity{
      */
     static public function showDecode($valueStr, $field = null, $nameField) {
         $stringDecodeJson = json_decode($valueStr, true);
+        if (!is_iterable($stringDecodeJson)) {
+            $stringDecodeJson = [['value' => $stringDecodeJson]];
+        }
+
         $arrayItens = [];
         foreach($stringDecodeJson as $item) {
             if(!is_null($field)) {
@@ -329,11 +333,11 @@ class Pdf extends \MapasCulturais\Entity{
         echo substr($items, 0 ,-1);
     }
     
-    static public function showAgenteOwnerField($field, $metaData) {
+    static public function showAgenteOwnerField($field, $metaData = null) {
         $valueField = null;
         $configEntityField = $field['config']['entityField'];
 
-        if (isset($metaData)) {
+        if ($metaData !== null) {
             if ($configEntityField == '@location') {
                 $location = json_decode($metaData, true);
                 if (isset($location['En_Complemento'])) {

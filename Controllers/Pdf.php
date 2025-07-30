@@ -2,13 +2,9 @@
 
 namespace PDFReport\Controllers;
 
-require PLUGINS_PATH . 'PDFReport/vendor/autoload.php';
-require PLUGINS_PATH . 'PDFReport/vendor/dompdf/dompdf/src/FontMetrics.php';
-
-use DateTime;
+use MapasCulturais\Entities\Registration;
 use Mpdf\Mpdf;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use Mpdf\HTMLParserMode;
 use \MapasCulturais\App;
 use PDFReport\Entities\Pdf as EntitiesPdf;
 
@@ -33,7 +29,7 @@ class Pdf extends \MapasCulturais\Controller
         'id' => 4,
         'title' => 'Relação de contatos',
         'enabled' => false,
-    ]; 
+    ];
 
     public static function getReports($id = null)
     {
@@ -134,7 +130,21 @@ class Pdf extends \MapasCulturais\Controller
         exit;
     }
 
-    function GET_minha_inscricao()
+    public function GET_minha_inscricao(): void
+    {
+        $app = App::i();
+        $reg = $app->repo('Registration')->find($this->data['id']);
+
+        //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
+        $fields[] = [
+            'opportunityName' => $reg->opportunity->name,
+            'fields' => EntitiesPdf::showAllFieldAndFile($reg),
+        ];
+
+        $this->renderMyRegistrationPDF($fields);
+    }
+
+    public function renderMyRegistrationPDF($registrationFieldConfigurations): void
     {
         ini_set('display_errors', 1);
         $app = App::i();
@@ -143,12 +153,16 @@ class Pdf extends \MapasCulturais\Controller
             $app->auth->requireAuthentication();
         }
 
-        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 
-                        'utf-8','format' => 'A4',
-                        'pagenumPrefix' => 'Página ',
-                        'pagenumSuffix' => '  ',
-                        'nbpgPrefix' => ' de ',
-            'nbpgSuffix' => ''
+        $mpdf = new Mpdf([
+            'tempDir' => '/tmp',
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'pagenumPrefix' => 'Página ',
+            'pagenumSuffix' => '  ',
+            'nbpgPrefix' => ' de ',
+            'nbpgSuffix' => '',
+            'margin_top' => 45,
+            'margin_bottom' => 30,
         ]);
 
         $reg = $app->repo('Registration')->find($this->data['id']);
@@ -172,30 +186,68 @@ class Pdf extends \MapasCulturais\Controller
         //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
-        //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
-        $fields = EntitiesPdf::showAllFieldAndFile($reg);
-
-        //ORDENANDO O ARRAY EM ORDEM DE ID
-        $registrationFieldConfigurations = $fields;
         $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
 
         ob_start();
 
         $content = $app->view->fetch('pdf/my-registration');
-        $footerPage = $app->view->fetch('pdf/footer-page-pdf');
-        $footerDocumentPage = $app->view->fetch('pdf/footer-document-pdf');
-        
-        $mpdf->SetHTMLFooter($footerPage);
-        $mpdf->SetHTMLFooter($footerPage, 'E');
 
         $mpdf->SetTitle('Mapas Culturais - Relatório');
         $stylesheet = file_get_contents(PLUGINS_PATH . 'PDFReport/assets/css/stylePdfReport.css');
-        $mpdf->WriteHTML(ob_get_clean());
-        $mpdf->WriteHTML($stylesheet, 1);
+        $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($content, 2);
-        $mpdf->SetHTMLFooter($footerPage . $footerDocumentPage);
-        $file_name = 'Ficha_de_inscricao.pdf';
-        $mpdf->Output();
+        $mpdf->WriteHTML(ob_get_clean());
+        $mpdf->Output($reg->number . '.pdf', 'I');
         exit;
+    }
+
+    public function GET_inscricaoCompleta(): void
+    {
+        $app = App::i();
+        /** @var Registration $reg */
+        $reg = $app->repo('Registration')->find($this->data['id']);
+        $regs = $this->getAllPhasesRegistration($reg);
+
+        $fields = [];
+
+        foreach ($regs as $reg) {
+            $fields[] = [
+                'opportunityName' => $reg->opportunity->name,
+                'fields' => EntitiesPdf::showAllFieldAndFile($reg),
+            ];
+        }
+
+        $this->renderMyRegistrationPDF($fields);
+    }
+
+    private function getAllPhasesRegistration(Registration $reg): array
+    {
+        $regs = [$reg];
+        $visitedOpportunities = [];
+
+        while (true) {
+            if (null === $reg->opportunity->parent) {
+                return $regs;
+            }
+
+            // Detect cyclic parent relationships
+            if (in_array($reg->opportunity->parent->id, $visitedOpportunities, true)) {
+                throw new \RuntimeException('Cyclic parent relationship detected in opportunities.');
+            }
+
+            $visitedOpportunities[] = $reg->opportunity->id;
+
+            $app = App::i();
+            $reg = $app->repo('Registration')->findOneBy([
+                'opportunity' => $reg->opportunity->parent,
+                'number' => $reg->number,
+            ]);
+
+            // Handle null result from findOneBy
+            if (null === $reg) {
+                throw new \RuntimeException('No matching registration found for parent opportunity.');
+            }
+            $regs[] = $reg;
+        }
     }
 }

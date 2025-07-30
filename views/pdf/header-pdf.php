@@ -21,7 +21,7 @@
     <thead>
         <tr class="">
             <td style="text-align: center">
-                <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/logoNova.png'; ?>" height="96px" />
+                <img src="<?php echo PLUGINS_PATH.'PDFReport/assets/img/logoNova.png'; ?>" height="50mm" style="margin-top: -50px;" />
             </td>
 <!--            <td>-->
 <!--            <img src="--><?php //echo PLUGINS_PATH.'PDFReport/assets/img/ESP-CE-ORGAO-SEC-INVERTIDA-WEB2_3.png'; ?><!--" style="margin-left: 380px;" alt="">-->
