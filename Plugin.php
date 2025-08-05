@@ -44,7 +44,7 @@ class Plugin extends \MapasCulturais\Plugin {
         $app = App::i();
         $registration = $app->repo('Registration')->find($id);
         if(!is_null($registration) && $registration->status <> 0) {
-            $app->view->part('reports/button-print', ['id' => $id]);
+            $app->view->part('reports/button-print', ['registration' => $registration]);
         }
     }
 

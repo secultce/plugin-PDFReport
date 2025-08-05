@@ -2,4 +2,8 @@
     display: flex !important;
     justify-content: space-between !important;
     flex-wrap: wrap !important;
- }
+}
+
+.pdf-report-btn {
+    margin-bottom: 10px;
+}

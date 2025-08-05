@@ -1,19 +1,20 @@
 <?php
+
 use PDFReport\Entities\Pdf;
 
 /**
- * RETORNO DE DOS METADATAS DO AGENTE COM OS INDICES SENDO O VALOR QUE ESTÁ 
+ * RETORNO DOS METADATAS DO AGENTE COM OS INDICES SENDO O VALOR QUE ESTÁ 
  * EM KEY NA TABELA E O RESULTADO SENDO O VALOR QUE ESTÁ EM VALUE NA TABELA
  */
 $result = $reg->getAgentsData();
-unset($result['owner']['nomeCompleto ']);
+unset($result['owner']['nomeCompleto']);
 
 $newAgentData = [];
 $newAgentData['shortDescription'] = $reg->owner->shortDescription;
 $newAgentData['longDescription'] = $reg->owner->longDescription;
 $newAgentData['nomeCompleto'] = $reg->owner->nomeCompleto;
 
-$agentMetaData = array_merge($result['owner'], $newAgentData);
+$agentMetaData = array_merge($result['owner'] ?? [], $newAgentData);
 
 $registrationMeta = $reg->getMetadata();
 ?>
@@ -99,9 +100,7 @@ $registrationMeta = $reg->getMetadata();
                             Pdf::showSpaceField($fields['config']['entityField'] , $valueMeta->value);
 
                         }else if($fields['fieldType'] == 'date') {
-                            echo 'aqui';
                             echo date("d/m/Y", strtotime($valueMeta->value));
-
                         }else if($fields['fieldType'] == 'links') {
 
                             Pdf::showDecode($valueMeta->value, 'title', 'value');
@@ -144,13 +143,7 @@ $registrationMeta = $reg->getMetadata();
                       
                     }
                 }
-            ?>
-            
-            <?php  
-           
             endif; //ENDIF showSpan
         endforeach;
-       //die;
     ?>
 </div>
-

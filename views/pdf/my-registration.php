@@ -1,7 +1,11 @@
 <?php
+
+use PDFReport\Entities\Pdf as EntitiesPdf;
+
 $this->layout = 'nolayout-pdf';
 
 $reg = $app->view->regObject['ins'];
+$allPhases = $app->view->regObject['allPhases'];
 
 include_once('header-pdf.php'); 
 ?>
@@ -167,7 +171,25 @@ include_once('header-pdf.php');
             </span><br>
         </div>
     </div>
-    <?php
-$fieldOp = $app->view->regObject['fieldsOpportunity'];
+<?php
 
-$this->part('reports/section', ['field' => $fieldOp, 'reg' => $reg]);
+if ($allPhases) {
+    $query = "SELECT id FROM registration WHERE number = :number AND opportunity_id <= :opportunity_id ORDER BY opportunity_id ASC";
+    $params = [
+        "number" => $reg->number,
+        "opportunity_id" => $reg->opportunity->id
+    ];
+    $conn = $app->em->getConnection();
+    $registrationsIds = $conn->fetchAllAssociative($query, $params);
+
+    foreach ($registrationsIds as $registrationsId) {
+        $registration = $app->repo('Registration')->find($registrationsId['id']);
+        $fields = EntitiesPdf::showAllFieldAndFile($registration);
+
+        $this->part('reports/section', ['field' => $fields, 'reg' => $registration]);
+    }
+} else {
+    $fields = EntitiesPdf::showAllFieldAndFile($reg);
+
+    $this->part('reports/section', ['field' => $fields, 'reg' => $reg]);
+}

@@ -134,68 +134,76 @@ class Pdf extends \MapasCulturais\Controller
         exit;
     }
 
-    function GET_minha_inscricao()
+    public function GET_imprimir_inscricao()
+    {
+        $allPhases = false;
+        $this->generatePdfRegistration($allPhases);
+    }
+
+    public function GET_imprimir_inscricao_todas_as_fases()
+    {
+        $allPhases = true;
+        $this->generatePdfRegistration($allPhases);
+    }
+
+    private function generatePdfRegistration($allPhases)
     {
         ini_set('display_errors', 1);
         $app = App::i();
-        //SOMENTE AUTENTICADO
+
+        // SOMENTE AUTENTICADO
         if ($app->user->is('guest')) {
             $app->auth->requireAuthentication();
         }
 
-        $mpdf = new Mpdf(['tempDir' => dirname(__DIR__) . '/vendor/mpdf/mpdf/tmp','mode' => 
-                        'utf-8','format' => 'A4',
-                        'pagenumPrefix' => 'Página ',
-                        'pagenumSuffix' => '  ',
-                        'nbpgPrefix' => ' de ',
+        $mpdf = new Mpdf([
+            'tempDir' => '/tmp',
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'pagenumPrefix' => 'Página ',
+            'pagenumSuffix' => '  ',
+            'nbpgPrefix' => ' de ',
             'nbpgSuffix' => ''
         ]);
 
         $reg = $app->repo('Registration')->find($this->data['id']);
 
-        //SE O DONO DA INSCRIÇÃO NAO FOR O MESMO LOGADO, ENTÃO NÃO TEM PERMISSÃO DE ACESSAR.
+        // SE O DONO DA INSCRIÇÃO NAO FOR O MESMO LOGADO, ENTÃO NÃO TEM PERMISSÃO DE ACESSAR.
         if ($reg->owner->userId != $app->user->id) {
             $userAdm = false;
-            //Checkando para saber se o usuário está no grupo de adm
-            foreach($reg->opportunity->agentRelations as $agent){
-                if($agent->agent->user->id == $app->user->id){
+            // Checkando para saber se o usuário está no grupo de adm
+            foreach ($reg->opportunity->agentRelations as $agent) {
+                if ($agent->agent->user->id == $app->user->id) {
                     $userAdm = true;
                 }
             }
-            //SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR
+            // SE OS IDS FOREM DIFERENTE, VERIRICA SE ELE NAO É UM ADMIN PARA RETORNAR A PÁGINA ANTERIOR
             if (!$userAdm && !$reg->opportunity->owner->canUser('@control')) {
                 $_SESSION['error'] = "Ops! Você não tem permissão";
                 $app->redirect($app->request()->getReferer(), 403);
             }
         }
 
-        //INSTANCIA DO TIPO ARRAY OBJETO
         $app->view->regObject = new \ArrayObject;
         $app->view->regObject['ins'] = $reg;
-        //CRIANDO UM ARRAY COM SOMENTE ALGUNS ITENS DO OBJETO
-        $fields = EntitiesPdf::showAllFieldAndFile($reg);
-
-        //ORDENANDO O ARRAY EM ORDEM DE ID
-        $registrationFieldConfigurations = $fields;
-        $app->view->regObject['fieldsOpportunity'] = $registrationFieldConfigurations;
+        $app->view->regObject['allPhases'] = $allPhases;
 
         ob_start();
 
+        $stylesheet = file_get_contents(PLUGINS_PATH . 'PDFReport/assets/css/stylePdfReport.css');
         $content = $app->view->fetch('pdf/my-registration');
         $footerPage = $app->view->fetch('pdf/footer-page-pdf');
         $footerDocumentPage = $app->view->fetch('pdf/footer-document-pdf');
-        
+
         $mpdf->SetHTMLFooter($footerPage);
         $mpdf->SetHTMLFooter($footerPage, 'E');
-
         $mpdf->SetTitle('Mapas Culturais - Relatório');
-        $stylesheet = file_get_contents(PLUGINS_PATH . 'PDFReport/assets/css/stylePdfReport.css');
         $mpdf->WriteHTML(ob_get_clean());
         $mpdf->WriteHTML($stylesheet, 1);
         $mpdf->WriteHTML($content, 2);
         $mpdf->SetHTMLFooter($footerPage . $footerDocumentPage);
-        $file_name = 'Ficha_de_inscricao.pdf';
         $mpdf->Output();
+
         exit;
     }
 }
