@@ -287,20 +287,24 @@ class Pdf extends \MapasCulturais\Entity{
      * @param [type] $nameField string do nome do campo do valor do array
      * @return void showDecode($valueMeta->value, 'title')
      */
-    static public function showDecode($valueStr, $field = null, $nameField) {
+    static public function showDecode($valueStr, $field = null, $nameField)
+    {
         $stringDecodeJson = json_decode($valueStr, true);
+        if (!is_iterable($stringDecodeJson)) {
+            $stringDecodeJson = [[$nameField => $stringDecodeJson]];
+        }
+
         $arrayItens = [];
-        foreach($stringDecodeJson as $item) {
-            if(!is_null($field)) {
-                if(isset($item[$field])){
-                    $arrayItens[] = "<strong>Titulo: </strong>".$item[$field]." - ".$item[$nameField];
-                }else{
+        foreach ($stringDecodeJson as $item) {
+            if (!is_null($field)) {
+                if (isset($item[$field])) {
+                    $arrayItens[] = "<strong>Titulo: </strong>" . $item[$field] . " - " . $item[$nameField];
+                } else {
                     $arrayItens[] = $item[$nameField];
                 }
-            }else{
+            } else {
                 $arrayItens[] = $item[$nameField];
             }
-            
         }
         echo implode(", ", $arrayItens);
     }
