@@ -5,11 +5,9 @@ namespace PDFReport\Controllers;
 require PLUGINS_PATH . 'PDFReport/vendor/autoload.php';
 require PLUGINS_PATH . 'PDFReport/vendor/dompdf/dompdf/src/FontMetrics.php';
 
-use DateTime;
 use Mpdf\Mpdf;
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use \MapasCulturais\App;
+use Mpdf\HTMLParserMode;
 use PDFReport\Entities\Pdf as EntitiesPdf;
 
 class Pdf extends \MapasCulturais\Controller
@@ -163,7 +161,9 @@ class Pdf extends \MapasCulturais\Controller
             'pagenumPrefix' => 'Página ',
             'pagenumSuffix' => '  ',
             'nbpgPrefix' => ' de ',
-            'nbpgSuffix' => ''
+            'nbpgSuffix' => '',
+            'margin_top' => 45,
+            'margin_bottom' => 30,
         ]);
 
         $reg = $app->repo('Registration')->find($this->data['id']);
@@ -188,22 +188,13 @@ class Pdf extends \MapasCulturais\Controller
         $app->view->regObject['ins'] = $reg;
         $app->view->regObject['allPhases'] = $allPhases;
 
-        ob_start();
-
         $stylesheet = file_get_contents(PLUGINS_PATH . 'PDFReport/assets/css/stylePdfReport.css');
         $content = $app->view->fetch('pdf/my-registration');
-        $footerPage = $app->view->fetch('pdf/footer-page-pdf');
-        $footerDocumentPage = $app->view->fetch('pdf/footer-document-pdf');
 
-        $mpdf->SetHTMLFooter($footerPage);
-        $mpdf->SetHTMLFooter($footerPage, 'E');
         $mpdf->SetTitle('Mapas Culturais - Relatório');
+        $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
+        $mpdf->WriteHTML($content);
         $mpdf->WriteHTML(ob_get_clean());
-        $mpdf->WriteHTML($stylesheet, 1);
-        $mpdf->WriteHTML($content, 2);
-        $mpdf->SetHTMLFooter($footerPage . $footerDocumentPage);
         $mpdf->Output();
-
-        exit;
     }
 }

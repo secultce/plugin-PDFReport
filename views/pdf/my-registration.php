@@ -1,13 +1,12 @@
 <?php
 
+use MapasCulturais\Entities\Opportunity;
 use PDFReport\Entities\Pdf as EntitiesPdf;
-
-$this->layout = 'nolayout-pdf';
 
 $reg = $app->view->regObject['ins'];
 $allPhases = $app->view->regObject['allPhases'];
 
-include_once('header-pdf.php'); 
+require THEMES_PATH . 'BaseV1/layouts/headpdf.php';
 ?>
 <table width="100%" style="height: 100px; margin-bottom: 24px; margin-top: 24px; width: 100%;">
     <thead>
@@ -171,6 +170,8 @@ include_once('header-pdf.php');
             </span><br>
         </div>
     </div>
+</main>
+
 <?php
 
 if ($allPhases) {
@@ -186,10 +187,13 @@ if ($allPhases) {
         $registration = $app->repo('Registration')->find($registrationsId['id']);
         $fields = EntitiesPdf::showAllFieldAndFile($registration);
 
-        $this->part('reports/section', ['field' => $fields, 'reg' => $registration]);
+        if ($registration->opportunity->status !== Opportunity::STATUS_TRASH)
+            $this->part('reports/section', ['field' => $fields, 'reg' => $registration]);
     }
 } else {
     $fields = EntitiesPdf::showAllFieldAndFile($reg);
 
     $this->part('reports/section', ['field' => $fields, 'reg' => $reg]);
 }
+
+require THEMES_PATH . 'BaseV1/views/pdf/footer-pdf.php';
